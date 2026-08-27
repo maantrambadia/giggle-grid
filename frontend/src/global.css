@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+:root {
+    --font-geist: 'Geist', sans-serif;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+* {
+    scrollbar-width: none;
+}
+
+html,
+body {
+    font-family: var(--font-geist);
+    -ms-overflow-style: none;
+}
+
+:root,
+.dark,
+.default,
+[data-theme="dark"],
+[data-theme="default"] {
+    color-scheme: dark;
+    /* Theme Colors (Dark Mode) */
+    --accent: oklch(82.45% 0.167 78.84);
+    --accent-foreground: oklch(23.992% 0.00778 274.611);
+    --background: oklch(19.574% 0.00002 271.152);
+    --border: oklch(28% 0.002 78.84);
+    --danger: oklch(64.743% 0.22583 28.361);
+    --danger-foreground: oklch(99.11% 0 0);
+    --default: oklch(29.629% 0.00435 16.977);
+    --default-foreground: oklch(99.11% 0 0);
+    --field-background: oklch(21.03% 0.004 78.84);
+    --field-foreground: oklch(99.11% 0.002 78.84);
+    --field-placeholder: oklch(70.5% 0.004 78.84);
+    --focus: oklch(82.45% 0.167 78.84);
+    --foreground: oklch(99.11% 0.002 78.84);
+    --muted: oklch(70.5% 0.004 78.84);
+    --overlay: oklch(24.386% 0.004 84.547);
+    --overlay-foreground: oklch(99.11% 0.002 78.84);
+    --scrollbar: oklch(70.5% 0.002 78.84);
+    --segment: oklch(39.64% 0.002 78.84);
+    --segment-foreground: oklch(99.11% 0.002 78.84);
+    --separator: oklch(31.28% 0.00172 106.82);
+    --success: oklch(73.29% 0.1943 129.81);
+    --success-foreground: oklch(21.03% 0.0059 129.81);
+    --surface: oklch(21.03% 0.004 78.84);
+    --surface-foreground: oklch(99.11% 0.002 78.84);
+    --surface-secondary: oklch(25.7% 0.003 78.84);
+    --surface-secondary-foreground: oklch(99.11% 0.002 78.84);
+    --surface-tertiary: oklch(27.21% 0.003 78.84);
+    --surface-tertiary-foreground: oklch(99.11% 0.002 78.84);
+    --warning: oklch(82.03% 0.1394 55.34);
+    --warning-foreground: oklch(21.03% 0.0059 55.34);
+
+    /* Border Radius */
+    --radius: 0.5rem;
+    --field-radius: 0.75rem;
+
+    /* Font Family */
+    /* Make sure to load Geist font in your app */
+    --font-sans: var(--font-geist);
+}

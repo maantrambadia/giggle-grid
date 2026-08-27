@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" class="dark" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary Meta Tags -->
+  <title>GiggleGrid</title>
+  <meta name="author" content="Maan Trambadia" />
+  <meta name="title" content="GiggleGrid" />
+  <meta name="description" content="GiggleGrid - Interactive Meme Platform" />
+  <meta name="theme-color" content="#ffb61a" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="GiggleGrid" />
+  <meta property="og:description" content="GiggleGrid - Interactive Meme Platform" />
+  <meta property="og:image" content="/fav/android-chrome-512x512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:url" content="https://gigglegrid.maantrambadia.com/" />
+  <meta property="twitter:title" content="GiggleGrid" />
+  <meta property="twitter:description" content="GiggleGrid - Interactive Meme Platform" />
+  <meta property="twitter:image" content="/fav/android-chrome-512x512.png" />
+
+  <!-- Favicon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/fav/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png" />
+  <link rel="manifest" href="/fav/site.webmanifest" />
+
+  <!-- Preload Fonts -->
+  <link rel="preload" href="/fonts/Geist-Regular.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/Geist-Medium.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/Geist-SemiBold.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/Geist-Bold.ttf" as="font" type="font/ttf" crossorigin />
+
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-Italic.ttf") format("truetype");
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-Medium.ttf") format("truetype");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-MediumItalic.ttf") format("truetype");
+      font-weight: 500;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-SemiBoldItalic.ttf") format("truetype");
+      font-weight: 600;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-Bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Geist";
+      src: url("/fonts/Geist-BoldItalic.ttf") format("truetype");
+      font-weight: 700;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    :root {
+      --background: oklch(19.574% 0.00002 271.152);
+    }
+
+    .dark {
+      --background: oklch(19.574% 0.00002 271.152);
+    }
+
+    body {
+      font-family: 'Geist', sans-serif;
+      background: var(--background);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
