@@ -14,16 +14,12 @@ public class UserService {
     private UserDao userDao;
 
     @Transactional
-    public User register(String username, String email, String password) {
+    public User register(String username, String password) {
         if (userDao.findByUsername(username) != null) {
             throw new RuntimeException("Username already taken");
         }
-        if (userDao.findByEmail(email) != null) {
-            throw new RuntimeException("Email already taken");
-        }
         User user = new User();
         user.setUsername(username);
-        user.setEmail(email);
         user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
         userDao.save(user);
         return user;

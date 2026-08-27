@@ -33,7 +33,7 @@ public class AppConfig {
         factory.setPackagesToScan("com.gigglegrid.model");
         Properties hibernate = new Properties();
         hibernate.put("hibernate.dialect", "org.hibernate.dialect.MariaDBDialect");
-        hibernate.put("hibernate.hbm2ddl.auto", "update");
+        hibernate.put("hibernate.hbm2ddl.auto", "none");
         hibernate.put("hibernate.show_sql", "true");
         hibernate.put("hibernate.format_sql", "true");
         hibernate.put("hibernate.use_sql_comments", "true");

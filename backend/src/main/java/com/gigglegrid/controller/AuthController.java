@@ -24,14 +24,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String username = body.get("username");
-        String email = body.get("email");
         String password = body.get("password");
         try {
-            User user = userService.register(username, email, password);
+            User user = userService.register(username, password);
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("username", user.getUsername());
-            response.put("email", user.getEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -48,7 +46,6 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("username", user.getUsername());
-            response.put("email", user.getEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
@@ -68,7 +65,6 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         response.put("id", user.getId());
         response.put("username", user.getUsername());
-        response.put("email", user.getEmail());
         return ResponseEntity.ok(response);
     }
 
