@@ -15,6 +15,7 @@ import {
   Login01Icon,
   UserIcon,
   SquareLockPasswordIcon,
+  ArrowLeft01Icon,
 } from "@hugeicons/core-free-icons";
 import { useAuth } from "@/hooks/auth";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
@@ -144,7 +145,14 @@ const LoginPage = () => {
             onPress={() => navigate("/")}
             isDisabled={submitting}
           >
-            Back to feed
+            <span className="flex items-center justify-center gap-2">
+              <HugeiconsIcon
+                icon={ArrowLeft01Icon}
+                strokeWidth={2}
+                className="size-5"
+              />
+              <span>Back to feed</span>
+            </span>
           </Button>
 
           <p className="pt-1 text-center text-sm text-muted-foreground">

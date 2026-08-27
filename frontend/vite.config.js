@@ -18,6 +18,7 @@ export default defineConfig({
         target: "http://localhost:8080/giggle-grid-backend",
         changeOrigin: true,
         secure: false,
+        cookiePathRewrite: "/",
       },
     },
   },

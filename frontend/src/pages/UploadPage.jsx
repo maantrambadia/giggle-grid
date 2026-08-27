@@ -1,0 +1,183 @@
+import { useMemo, useState } from "react";
+import {
+  Button,
+  Spinner,
+  Card,
+  TextField,
+  Label,
+  InputGroup,
+  Separator,
+} from "@heroui/react";
+import { useNavigate } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/auth";
+import StateMessage from "@/components/ui/StateMessage";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Upload04Icon,
+  Image02Icon,
+  TextIcon,
+  ArrowLeft01Icon,
+} from "@hugeicons/core-free-icons";
+import api from "@/lib/axios";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
+
+const UploadPage = () => {
+  useDocumentTitle("Upload");
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const [caption, setCaption] = useState("");
+  const [file, setFile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const canSubmit = useMemo(() => {
+    return caption.trim().length > 0 && !!file && !submitting;
+  }, [caption, file, submitting]);
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+
+    setError("");
+    setSubmitting(true);
+    try {
+      const form = new FormData();
+      form.append("caption", caption.trim());
+      form.append("image", file);
+
+      await api.post("/memes/upload", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      await queryClient.invalidateQueries({ queryKey: ["memes"] });
+      navigate("/", { replace: true });
+    } catch (e) {
+      setError(e.response?.data?.error || "Upload failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <Card
+        className="relative w-full max-w-xl p-6 shadow-xl backdrop-blur sm:p-10"
+        variant="secondary"
+      >
+        <Card.Header>
+          <div className="space-y-2 text-center">
+            <Card.Title className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Upload meme
+            </Card.Title>
+            <Card.Description className="pt-1 text-sm text-muted-foreground sm:text-base">
+              Add a caption and upload your meme image.
+            </Card.Description>
+          </div>
+        </Card.Header>
+
+        <Card.Content className="mt-8 flex flex-col gap-5">
+          <TextField
+            name="caption"
+            onChange={setCaption}
+            isDisabled={submitting}
+            className="rounded-xl border-b"
+          >
+            <Label>Caption</Label>
+            <InputGroup className="h-12 text-base">
+              <InputGroup.Prefix>
+                <HugeiconsIcon
+                  icon={TextIcon}
+                  strokeWidth={2}
+                  className="size-4 text-muted"
+                />
+              </InputGroup.Prefix>
+              <InputGroup.Input
+                className="w-full px-4 text-base"
+                placeholder="Write something funny..."
+                value={caption}
+              />
+            </InputGroup>
+          </TextField>
+
+          <div className="space-y-2">
+            <Label>Meme image</Label>
+            <div className="flex flex-col gap-3 rounded-xl border border-dashed border-divider p-4">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <HugeiconsIcon
+                  icon={Image02Icon}
+                  strokeWidth={2}
+                  className="size-5"
+                />
+                <span>
+                  {file ? file.name : "Choose a JPG/PNG image (max 5MB)"}
+                </span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                disabled={submitting}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-default file:px-4 file:py-2 file:text-default-foreground hover:file:opacity-90"
+              />
+            </div>
+          </div>
+
+          {error ? (
+            <StateMessage
+              title="Upload failed"
+              description={error}
+              className="mt-0"
+            />
+          ) : null}
+
+          <Button
+            fullWidth
+            size="lg"
+            color="primary"
+            isDisabled={!canSubmit}
+            isPending={submitting}
+            onPress={handleSubmit}
+          >
+            {({ isPending }) => (
+              <>
+                {isPending ? <Spinner color="current" size="sm" /> : null}
+                {!isPending ? (
+                  <HugeiconsIcon
+                    icon={Upload04Icon}
+                    strokeWidth={2}
+                    className="size-5"
+                  />
+                ) : null}
+                {isPending ? "Uploading..." : "Upload"}
+              </>
+            )}
+          </Button>
+
+          <Separator />
+
+          <Button
+            fullWidth
+            variant="ghost"
+            onPress={() => navigate("/")}
+            isDisabled={submitting}
+          >
+            <span className="flex items-center justify-center gap-2">
+              <HugeiconsIcon
+                icon={ArrowLeft01Icon}
+                strokeWidth={2}
+                className="size-5"
+              />
+              <span>Back to feed</span>
+            </span>
+          </Button>
+        </Card.Content>
+      </Card>
+    </div>
+  );
+};
+
+export default UploadPage;

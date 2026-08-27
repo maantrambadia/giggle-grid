@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { AuthProvider } from "@/context/AuthContext";
 import Loading from "@/components/Loading";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Chip } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -14,6 +15,7 @@ import { usePing } from "@/hooks/usePing";
 import FeedPage from "@/pages/FeedPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import UploadPage from "@/pages/UploadPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 const RouteTransition = ({ children }) => {
@@ -99,6 +101,20 @@ const App = () => {
               </Suspense>
             }
           />
+
+          <Route element={<ProtectedRoute />}>
+            <Route
+              path="/upload"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <RouteTransition>
+                    <UploadPage />
+                  </RouteTransition>
+                </Suspense>
+              }
+            />
+          </Route>
+
           <Route
             path="*"
             element={

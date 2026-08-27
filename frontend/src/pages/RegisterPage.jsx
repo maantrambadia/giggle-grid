@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Spinner,
@@ -15,7 +15,9 @@ import {
   UserAdd01Icon,
   UserIcon,
   SquareLockPasswordIcon,
+  ArrowLeft01Icon,
 } from "@hugeicons/core-free-icons";
+import StateMessage from "@/components/ui/StateMessage";
 import { useAuth } from "@/hooks/auth";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 
@@ -28,6 +30,8 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [displayedPasswordMismatch, setDisplayedPasswordMismatch] =
+    useState(false);
 
   const passwordMismatch =
     confirmPassword.length > 0 &&
@@ -42,6 +46,13 @@ const RegisterPage = () => {
       !submitting
     );
   }, [username, password, passwordMismatch, submitting]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisplayedPasswordMismatch(passwordMismatch);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [password, confirmPassword, passwordMismatch]);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -149,8 +160,12 @@ const RegisterPage = () => {
             </InputGroup>
           </TextField>
 
-          {passwordMismatch ? (
-            <p className="text-sm text-danger">Passwords do not match</p>
+          {displayedPasswordMismatch ? (
+            <StateMessage
+              title="Passwords do not match"
+              description="Please enter the same password in both fields."
+              className="mt-0"
+            />
           ) : null}
 
           <Button
@@ -184,7 +199,14 @@ const RegisterPage = () => {
             onPress={() => navigate("/")}
             isDisabled={submitting}
           >
-            Back to feed
+            <span className="flex items-center justify-center gap-2">
+              <HugeiconsIcon
+                icon={ArrowLeft01Icon}
+                strokeWidth={2}
+                className="size-5"
+              />
+              <span>Back to feed</span>
+            </span>
           </Button>
 
           <p className="pt-1 text-center text-sm text-muted-foreground">
