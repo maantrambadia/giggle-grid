@@ -1,1 +1,1 @@
-# GiggleGrid
+# GiggleGrid - Interactive Meme Platform
