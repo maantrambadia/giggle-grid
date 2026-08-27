@@ -76,6 +76,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (username, password) => {
+    try {
+      const userData = await authService.register({ username, password });
+
+      await queryClient.cancelQueries();
+      queryClient.clear();
+
+      setUser(userData);
+      toast.success(`Welcome, ${userData.username}!`);
+      navigate("/", { replace: true });
+
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error || "Registration failed. Please try again.";
+      toast.warning(errorMessage);
+      return { success: false, error: errorMessage };
+    }
+  };
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -94,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

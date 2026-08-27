@@ -13,6 +13,7 @@ import { usePing } from "@/hooks/usePing";
 
 import FeedPage from "@/pages/FeedPage";
 import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 
 const RouteTransition = ({ children }) => {
@@ -84,6 +85,16 @@ const App = () => {
               <Suspense fallback={<Loading />}>
                 <RouteTransition>
                   <LoginPage />
+                </RouteTransition>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Suspense fallback={<Loading />}>
+                <RouteTransition>
+                  <RegisterPage />
                 </RouteTransition>
               </Suspense>
             }

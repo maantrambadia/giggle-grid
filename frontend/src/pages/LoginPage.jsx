@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   Button,
-  Checkbox,
   Spinner,
   Card,
   TextField,
@@ -13,7 +12,6 @@ import {
 import { useNavigate } from "react-router";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  ArrowLeft01Icon,
   Login01Icon,
   UserIcon,
   SquareLockPasswordIcon,
@@ -28,7 +26,6 @@ const LoginPage = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = useMemo(() => {
@@ -40,7 +37,7 @@ const LoginPage = () => {
 
     setSubmitting(true);
     try {
-      await login(username.trim(), password, rememberMe);
+      await login(username.trim(), password);
     } finally {
       setSubmitting(false);
     }
@@ -53,24 +50,11 @@ const LoginPage = () => {
         variant="secondary"
       >
         <Card.Header>
-          <Button
-            isIconOnly
-            variant="ghost"
-            className="absolute left-4 top-4"
-            onPress={() => navigate("/")}
-            isDisabled={submitting}
-          >
-            <HugeiconsIcon
-              icon={ArrowLeft01Icon}
-              strokeWidth={2}
-              className="size-5"
-            />
-          </Button>
           <div className="space-y-2 text-center">
             <Card.Title className="text-2xl font-semibold tracking-tight sm:text-3xl">
               Login
             </Card.Title>
-            <Card.Description className="text-sm text-muted-foreground sm:text-base pt-1">
+            <Card.Description className="pt-1 text-sm text-muted-foreground sm:text-base">
               Use your username and password to access your account.
             </Card.Description>
           </div>
@@ -81,7 +65,7 @@ const LoginPage = () => {
             name="username"
             onChange={setUsername}
             isDisabled={submitting}
-            className="border-b rounded-xl"
+            className="rounded-xl border-b"
           >
             <Label>Username</Label>
             <InputGroup className="h-12 text-base">
@@ -105,7 +89,7 @@ const LoginPage = () => {
             name="password"
             onChange={setPassword}
             isDisabled={submitting}
-            className="border-b rounded-xl"
+            className="rounded-xl border-b"
           >
             <Label>Password</Label>
             <InputGroup className="h-12 text-base">
@@ -128,22 +112,6 @@ const LoginPage = () => {
               />
             </InputGroup>
           </TextField>
-
-          <div className="flex items-center justify-between gap-3 pt-1">
-            <Checkbox
-              id="remember-me"
-              isSelected={rememberMe}
-              onChange={setRememberMe}
-              isDisabled={submitting}
-            >
-              <Checkbox.Control className="size-4.5">
-                <Checkbox.Indicator />
-              </Checkbox.Control>
-              <Checkbox.Content>
-                <Label htmlFor="remember-me">Remember me</Label>
-              </Checkbox.Content>
-            </Checkbox>
-          </div>
 
           <Button
             fullWidth
@@ -170,14 +138,23 @@ const LoginPage = () => {
 
           <Separator />
 
+          <Button
+            fullWidth
+            variant="secondary"
+            onPress={() => navigate("/")}
+            isDisabled={submitting}
+          >
+            Back to feed
+          </Button>
+
           <p className="pt-1 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
-              onPress={() => navigate("/request-access")}
+              onPress={() => navigate("/register")}
               isDisabled={submitting}
               className="gap-1"
             >
-              Request access
+              Register
               <Link.Icon />
             </Link>
           </p>
