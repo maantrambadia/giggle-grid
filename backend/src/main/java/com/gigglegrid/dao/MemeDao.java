@@ -19,25 +19,40 @@ public class MemeDao {
     }
 
     public Meme findById(Long id) {
-        return sessionFactory.getCurrentSession().get(Meme.class, id);
+        Session session = sessionFactory.getCurrentSession();
+        Query<Meme> query = session.createQuery(
+                "select m from Meme m join fetch m.user where m.id = :id",
+                Meme.class
+        );
+        query.setParameter("id", id);
+        return query.uniqueResult();
     }
 
     public List<Meme> findAll() {
         Session session = sessionFactory.getCurrentSession();
-        Query<Meme> query = session.createQuery("from Meme m order by m.createdAt desc", Meme.class);
+        Query<Meme> query = session.createQuery(
+                "select distinct m from Meme m join fetch m.user order by m.createdAt desc",
+                Meme.class
+        );
         return query.getResultList();
     }
 
     public List<Meme> searchByCaption(String keyword) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Meme> query = session.createQuery("from Meme m where lower(m.caption) like lower(:keyword) order by m.createdAt desc", Meme.class);
+        Query<Meme> query = session.createQuery(
+                "select distinct m from Meme m join fetch m.user where lower(m.caption) like lower(:keyword) order by m.createdAt desc",
+                Meme.class
+        );
         query.setParameter("keyword", "%" + keyword + "%");
         return query.getResultList();
     }
 
     public List<Meme> findByUserId(Long userId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Meme> query = session.createQuery("from Meme m where m.user.id = :userId order by m.createdAt desc", Meme.class);
+        Query<Meme> query = session.createQuery(
+                "select distinct m from Meme m join fetch m.user where m.user.id = :userId order by m.createdAt desc",
+                Meme.class
+        );
         query.setParameter("userId", userId);
         return query.getResultList();
     }

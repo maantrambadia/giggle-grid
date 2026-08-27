@@ -24,11 +24,11 @@ public class LikeController {
     public ResponseEntity<?> like(@PathVariable Long id, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required."));
         }
         User user = userService.getById(userId);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session."));
         }
         boolean liked = likeService.toggleLike(id, user);
         return ResponseEntity.ok(Map.of(

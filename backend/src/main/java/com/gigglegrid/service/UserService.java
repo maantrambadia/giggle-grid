@@ -16,7 +16,7 @@ public class UserService {
     @Transactional
     public User register(String username, String password) {
         if (userDao.findByUsername(username) != null) {
-            throw new RuntimeException("Username already taken");
+            throw new RuntimeException("Username already taken.");
         }
         User user = new User();
         user.setUsername(username);
@@ -29,10 +29,10 @@ public class UserService {
     public User login(String username, String password) {
         User user = userDao.findByUsername(username);
         if (user == null) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid username or password.");
         }
         if (!BCrypt.checkpw(password, user.getPasswordHash())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid username or password.");
         }
         return user;
     }

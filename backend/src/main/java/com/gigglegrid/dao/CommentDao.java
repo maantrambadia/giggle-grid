@@ -20,7 +20,10 @@ public class CommentDao {
 
     public List<Comment> findByMemeId(Long memeId) {
         Session session = sessionFactory.getCurrentSession();
-        Query<Comment> query = session.createQuery("from Comment c where c.meme.id = :memeId order by c.createdAt desc", Comment.class);
+        Query<Comment> query = session.createQuery(
+                "select c from Comment c join fetch c.user where c.meme.id = :memeId order by c.createdAt desc",
+                Comment.class
+        );
         query.setParameter("memeId", memeId);
         return query.getResultList();
     }

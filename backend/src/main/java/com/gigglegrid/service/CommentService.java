@@ -23,7 +23,7 @@ public class CommentService {
     public Comment addComment(Long memeId, User user, String text) {
         Meme meme = memeDao.findById(memeId);
         if (meme == null) {
-            throw new RuntimeException("Meme not found");
+            throw new RuntimeException("Meme not found.");
         }
         Comment comment = new Comment();
         comment.setText(text);

@@ -36,7 +36,7 @@ public class LikeService {
         }
         Meme meme = memeDao.findById(memeId);
         if (meme == null) {
-            throw new RuntimeException("Meme not found");
+            throw new RuntimeException("Meme not found.");
         }
         Like like = new Like();
         like.setMeme(meme);

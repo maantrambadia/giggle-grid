@@ -88,19 +88,19 @@ public class MemeController {
             HttpServletRequest request) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required."));
         }
         User user = userService.getById(userId);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session."));
         }
         if (image == null || image.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Image is required"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Image is required."));
         }
         try {
             String uploadDir = servletContext.getRealPath("/uploads");
             if (uploadDir == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Upload directory not available"));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Upload directory not available."));
             }
             File dir = new File(uploadDir);
             if (!dir.exists()) {
@@ -127,7 +127,7 @@ public class MemeController {
             response.put("author", user.getUsername());
             return ResponseEntity.ok(response);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to upload image"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to upload image."));
         }
     }
 
@@ -135,15 +135,15 @@ public class MemeController {
     public ResponseEntity<?> delete(@PathVariable Long id, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required."));
         }
         User user = userService.getById(userId);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session."));
         }
         try {
             memeService.delete(id, user);
-            return ResponseEntity.ok(Map.of("message", "Meme deleted"));
+            return ResponseEntity.ok(Map.of("message", "Meme deleted."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
         }

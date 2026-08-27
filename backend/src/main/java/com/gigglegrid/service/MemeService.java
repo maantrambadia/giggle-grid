@@ -45,7 +45,7 @@ public class MemeService {
     public void delete(Long id, User user) {
         Meme meme = memeDao.findById(id);
         if (meme == null || !meme.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Not allowed to delete this meme");
+            throw new RuntimeException("Not allowed to delete this meme.");
         }
         memeDao.delete(meme);
     }

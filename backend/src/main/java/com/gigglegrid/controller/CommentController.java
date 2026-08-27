@@ -39,15 +39,15 @@ public class CommentController {
     public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody Map<String, String> body, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Login required."));
         }
         User user = userService.getById(userId);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session."));
         }
         String text = body.get("text");
         if (text == null || text.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Comment text is required"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Comment text is required."));
         }
         Comment comment = commentService.addComment(id, user, text.trim());
         Map<String, Object> map = new java.util.HashMap<>();
