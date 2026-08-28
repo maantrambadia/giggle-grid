@@ -6,9 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/memes")
 public class MemeController {
 
+    private static final Set<String> ALLOWED_IMAGE_TYPES = new HashSet<>(
+            Arrays.asList("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"));
+
     @Autowired
     private MemeService memeService;
 
@@ -45,37 +51,40 @@ public class MemeController {
     private ServletContext servletContext;
 
     @GetMapping
-    public ResponseEntity<?> getAll(HttpServletRequest request, @RequestParam(required = false) String keyword) {
+    public ResponseEntity<?> getAll(HttpServletRequest request, HttpSession session, @RequestParam(required = false) String keyword) {
         List<Meme> memes = keyword == null || keyword.trim().isEmpty()
                 ? memeService.getAll()
                 : memeService.search(keyword);
         String baseUrl = getBaseUrl(request);
+        User currentUser = getCurrentUser(session);
         List<Map<String, Object>> result = new ArrayList<>();
         for (Meme meme : memes) {
-            result.add(mapMeme(meme, baseUrl));
+            result.add(mapMeme(meme, baseUrl, currentUser));
         }
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request, HttpSession session) {
         Meme meme = memeService.getById(id);
         if (meme == null) {
             return ResponseEntity.notFound().build();
         }
         String baseUrl = getBaseUrl(request);
-        Map<String, Object> result = mapMeme(meme, baseUrl);
+        User currentUser = getCurrentUser(session);
+        Map<String, Object> result = mapMeme(meme, baseUrl, currentUser);
         result.put("comments", mapComments(commentService.getComments(id)));
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getByUser(@PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<?> getByUser(@PathVariable Long userId, HttpServletRequest request, HttpSession session) {
         List<Meme> memes = memeService.getByUserId(userId);
         String baseUrl = getBaseUrl(request);
+        User currentUser = getCurrentUser(session);
         List<Map<String, Object>> result = new ArrayList<>();
         for (Meme meme : memes) {
-            result.add(mapMeme(meme, baseUrl));
+            result.add(mapMeme(meme, baseUrl, currentUser));
         }
         return ResponseEntity.ok(result);
     }
@@ -97,6 +106,10 @@ public class MemeController {
         if (image == null || image.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Image is required."));
         }
+        String contentType = image.getContentType();
+        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Only JPG, PNG, GIF, or WEBP images are allowed."));
+        }
         try {
             String uploadDir = servletContext.getRealPath("/uploads");
             if (uploadDir == null) {
@@ -107,7 +120,8 @@ public class MemeController {
                 dir.mkdirs();
             }
             String original = image.getOriginalFilename();
-            String ext = original != null ? original.substring(original.lastIndexOf(".")) : ".jpg";
+            int dot = original != null ? original.lastIndexOf(".") : -1;
+            String ext = dot >= 0 ? original.substring(dot) : ".jpg";
             String fileName = UUID.randomUUID().toString() + ext;
             Path filePath = Paths.get(uploadDir, fileName);
             Files.copy(image.getInputStream(), filePath);
@@ -149,11 +163,19 @@ public class MemeController {
         }
     }
 
+    private User getCurrentUser(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return null;
+        }
+        return userService.getById(userId);
+    }
+
     private String getBaseUrl(HttpServletRequest request) {
         return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 
-    private Map<String, Object> mapMeme(Meme meme, String baseUrl) {
+    private Map<String, Object> mapMeme(Meme meme, String baseUrl, User currentUser) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", meme.getId());
         map.put("caption", meme.getCaption());
@@ -162,6 +184,7 @@ public class MemeController {
         map.put("author", meme.getUser().getUsername());
         map.put("likeCount", likeService.countLikes(meme.getId()));
         map.put("commentCount", commentService.countComments(meme.getId()));
+        map.put("hasUserLiked", likeService.hasUserLiked(meme.getId(), currentUser));
         return map;
     }
 
