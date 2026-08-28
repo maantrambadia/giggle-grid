@@ -59,6 +59,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
   const [commentText, setCommentText] = useState("");
   const [showDelete, setShowDelete] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const likeMutation = useMutation({
     mutationFn: () => toggleLike(memeId),
@@ -87,6 +88,38 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
   const canSubmitComment =
     commentText.trim().length > 0 && !commentMutation.isPending;
+
+  const handleDownload = async () => {
+    if (!imageUrl) return;
+
+    setIsDownloading(true);
+    try {
+      const response = await fetch(imageUrl, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch image.");
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = imageUrl.split("/").pop() || "meme.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <>
@@ -185,9 +218,9 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                           <Button
                             size="sm"
                             color="primary"
-                            as="a"
-                            href={imageUrl}
-                            download
+                            isPending={isDownloading}
+                            isDisabled={isDownloading}
+                            onPress={handleDownload}
                           >
                             <span className="flex items-center gap-2">
                               <HugeiconsIcon
@@ -195,7 +228,9 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                                 strokeWidth={2}
                                 className="size-5"
                               />
-                              <span>Download</span>
+                              <span>
+                                {isDownloading ? "Downloading..." : "Download"}
+                              </span>
                             </span>
                           </Button>
                         ) : null}
