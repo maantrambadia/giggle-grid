@@ -22,11 +22,12 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> register(@RequestBody Map<String, String> body, HttpSession session) {
         String username = body.get("username");
         String password = body.get("password");
         try {
             User user = userService.register(username, password);
+            session.setAttribute("userId", user.getId());
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("username", user.getUsername());
