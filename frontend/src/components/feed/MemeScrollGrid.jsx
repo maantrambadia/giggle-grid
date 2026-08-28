@@ -1,11 +1,12 @@
 import { ScrollShadow } from "@heroui/react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MemeCard from "@/components/feed/MemeCard";
 
 const PAGE_SIZE = 9;
 
-const MemeScrollGrid = ({ memes, onOpen }) => {
+const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
   const scrollerRef = useRef(null);
+  const hasReset = useRef(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const visible = useMemo(() => {
@@ -24,6 +25,18 @@ const MemeScrollGrid = ({ memes, onOpen }) => {
     const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 220;
     if (nearBottom) loadMore();
   };
+
+  useEffect(() => {
+    if (hasReset.current) {
+      setVisibleCount(PAGE_SIZE);
+      scrollerRef.current?.scrollTo?.({
+        top: 0,
+        behavior: "smooth",
+      });
+    } else {
+      hasReset.current = true;
+    }
+  }, [isTrending]);
 
   return (
     <ScrollShadow

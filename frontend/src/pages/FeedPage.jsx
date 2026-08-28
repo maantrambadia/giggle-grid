@@ -115,7 +115,11 @@ const FeedPage = () => {
             </div>
           </div>
         ) : (
-          <MemeScrollGrid memes={list} onOpen={openMeme} />
+          <MemeScrollGrid
+            memes={list}
+            onOpen={openMeme}
+            isTrending={isTrending}
+          />
         )}
       </main>
 

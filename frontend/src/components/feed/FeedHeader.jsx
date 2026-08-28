@@ -49,7 +49,7 @@ const FeedHeader = ({
           </Button>
           <Button
             className="flex-1 sm:flex-initial"
-            variant="tertiary"
+            variant={isTrending ? "solid" : "tertiary"}
             color={isTrending ? "warning" : "default"}
             onPress={onTrending}
           >
