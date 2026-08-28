@@ -1,9 +1,9 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { AuthProvider } from "@/context/AuthContext";
 import Loading from "@/components/Loading";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { GuestRoute, ProtectedRoute } from "@/components/ProtectedRoute";
 import { Chip } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -12,11 +12,11 @@ import {
 } from "@hugeicons/core-free-icons";
 import { usePing } from "@/hooks/usePing";
 
-import FeedPage from "@/pages/FeedPage";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
-import UploadPage from "@/pages/UploadPage";
-import NotFoundPage from "@/pages/NotFoundPage";
+const FeedPage = lazy(() => import("@/pages/FeedPage"));
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
+const UploadPage = lazy(() => import("@/pages/UploadPage"));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 
 const RouteTransition = ({ children }) => {
   const MotionDiv = motion.div;
@@ -81,26 +81,28 @@ const App = () => {
               </Suspense>
             }
           />
-          <Route
-            path="/login"
-            element={
-              <Suspense fallback={<Loading />}>
-                <RouteTransition>
-                  <LoginPage />
-                </RouteTransition>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <Suspense fallback={<Loading />}>
-                <RouteTransition>
-                  <RegisterPage />
-                </RouteTransition>
-              </Suspense>
-            }
-          />
+          <Route element={<GuestRoute />}>
+            <Route
+              path="/login"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <RouteTransition>
+                    <LoginPage />
+                  </RouteTransition>
+                </Suspense>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <RouteTransition>
+                    <RegisterPage />
+                  </RouteTransition>
+                </Suspense>
+              }
+            />
+          </Route>
 
           <Route element={<ProtectedRoute />}>
             <Route
