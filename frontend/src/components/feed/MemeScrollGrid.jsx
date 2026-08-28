@@ -29,7 +29,8 @@ const MemeScrollGrid = ({ memes, onOpen }) => {
     <ScrollShadow
       ref={scrollerRef}
       hideScrollBar
-      className="mt-3 max-h-[calc(100dvh-140px)] sm:mt-6 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-220px)]"
+      size="100"
+      className="mt-3 max-h-[calc(100dvh-140px)] sm:mt-6 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-150px)]"
       onScroll={handleScroll}
     >
       <div className="grid gap-6 pb-1 sm:pb-4 sm:grid-cols-2 lg:grid-cols-3">
