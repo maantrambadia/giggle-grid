@@ -141,6 +141,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                             src={imageUrl}
                             alt={caption}
                             className="w-full object-contain"
+                            draggable={false}
                           />
                         </div>
                       ) : null}

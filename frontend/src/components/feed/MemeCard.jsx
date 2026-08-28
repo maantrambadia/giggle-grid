@@ -54,6 +54,7 @@ const MemeCard = ({ meme, onOpen }) => {
               alt={meme.caption}
               className="h-64 w-full rounded-2xl object-cover"
               loading="lazy"
+              draggable={false}
             />
             <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-black/55 to-transparent" />
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
