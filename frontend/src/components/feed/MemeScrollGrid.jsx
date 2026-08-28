@@ -29,10 +29,10 @@ const MemeScrollGrid = ({ memes, onOpen }) => {
     <ScrollShadow
       ref={scrollerRef}
       hideScrollBar
-      className="mt-6 max-h-[calc(100vh-240px)]"
+      className="mt-3 max-h-[calc(100dvh-140px)] sm:mt-6 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-220px)]"
       onScroll={handleScroll}
     >
-      <div className="grid gap-6 pb-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 pb-1 sm:pb-4 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((meme) => (
           <MemeCard key={meme.id} meme={meme} onOpen={onOpen} />
         ))}

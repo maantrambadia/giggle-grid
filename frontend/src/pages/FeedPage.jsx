@@ -16,6 +16,7 @@ import FeedHeader from "@/components/feed/FeedHeader";
 import MemeSkeletonGrid from "@/components/feed/MemeSkeletonGrid";
 import MemeScrollGrid from "@/components/feed/MemeScrollGrid";
 import MemeModal from "@/components/feed/MemeModal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 const sortByTrending = (a, b) => {
   const al = a?.likeCount ?? 0;
@@ -34,6 +35,7 @@ const FeedPage = () => {
   const [isTrending, setIsTrending] = useState(false);
   const [selected, setSelected] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
   const {
     data: memes,
@@ -65,14 +67,18 @@ const FeedPage = () => {
           isTrending={isTrending}
           rightContent={
             user ? (
-              <Button variant="danger-soft" onPress={logout}>
-                <span className="flex items-center gap-2">
+              <Button
+                className="flex-1 sm:flex-initial"
+                variant="danger-soft"
+                onPress={() => setShowLogout(true)}
+              >
+                <span className="flex w-full items-center justify-center gap-2">
                   <HugeiconsIcon
                     icon={Logout03Icon}
                     strokeWidth={2}
                     className="size-5"
                   />
-                  <span>Logout</span>
+                  <span className="sm:hidden">Logout</span>
                 </span>
               </Button>
             ) : null
@@ -117,6 +123,18 @@ const FeedPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         meme={selected}
+      />
+
+      <ConfirmDialog
+        isOpen={showLogout}
+        onOpenChange={setShowLogout}
+        onConfirm={logout}
+        title="Log out?"
+        description="Are you sure you want to log out of your account?"
+        confirmText="Logout"
+        cancelText="Cancel"
+        confirmColor="danger"
+        confirmIcon={Logout03Icon}
       />
     </div>
   );
