@@ -108,9 +108,18 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
 
+      const originalName = relativeUrl.split("/").pop() || "meme.jpg";
+      const ext = originalName.includes(".")
+        ? originalName.substring(originalName.lastIndexOf("."))
+        : ".jpg";
+      const safeCaption = (caption || "meme")
+        .trim()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9_-]/g, "");
+
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = relativeUrl.split("/").pop() || "meme.jpg";
+      link.download = `${safeCaption || "meme"}${ext}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
