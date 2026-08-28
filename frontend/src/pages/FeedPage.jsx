@@ -8,7 +8,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Logout03Icon,
   Alert02Icon,
-  SentIcon,
   Image02Icon,
 } from "@hugeicons/core-free-icons";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
@@ -18,10 +17,14 @@ import MemeSkeletonGrid from "@/components/feed/MemeSkeletonGrid";
 import MemeScrollGrid from "@/components/feed/MemeScrollGrid";
 import MemeModal from "@/components/feed/MemeModal";
 
-const sortByLikesDesc = (a, b) => {
+const sortByTrending = (a, b) => {
   const al = a?.likeCount ?? 0;
   const bl = b?.likeCount ?? 0;
-  return bl - al;
+  if (bl !== al) return bl - al;
+
+  const ad = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+  const bd = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+  return bd - ad;
 };
 
 const FeedPage = () => {
@@ -44,7 +47,7 @@ const FeedPage = () => {
   const list = useMemo(() => {
     const arr = Array.isArray(memes) ? memes : [];
     if (!isTrending) return arr;
-    return [...arr].sort(sortByLikesDesc);
+    return [...arr].sort(sortByTrending);
   }, [memes, isTrending]);
 
   const openMeme = (meme) => {

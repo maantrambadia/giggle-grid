@@ -7,6 +7,7 @@ import {
   Label,
   InputGroup,
   Separator,
+  ScrollShadow,
 } from "@heroui/react";
 import StateMessage from "@/components/ui/StateMessage";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
   const full = data || meme;
 
+  const hasLiked = useMemo(() => !!full?.hasUserLiked, [full?.hasUserLiked]);
   const likeCount = full?.likeCount ?? 0;
   const commentCount = full?.commentCount ?? 0;
   const comments = Array.isArray(full?.comments) ? full.comments : [];
@@ -110,159 +112,181 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
             </Modal.Header>
 
             <Modal.Body>
-              {isLoading ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-72 w-full rounded-2xl" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : isError ? (
-                <StateMessage
-                  title="Can't open meme"
-                  description="Failed to load meme details."
-                  className="mt-0"
-                />
-              ) : (
-                <div className="space-y-4">
-                  {imageUrl ? (
-                    <div className="overflow-hidden rounded-2xl">
-                      <img
-                        src={imageUrl}
-                        alt={caption}
-                        className="w-full object-contain"
-                      />
-                    </div>
-                  ) : null}
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Button
-                      variant="flat"
-                      isDisabled={!user || likeMutation.isPending}
-                      onPress={() => likeMutation.mutate()}
-                    >
-                      <span className="flex items-center gap-2">
-                        <HugeiconsIcon
-                          icon={FavouriteIcon}
-                          strokeWidth={2}
-                          className="size-5"
-                        />
-                        <span>{likeCount}</span>
-                      </span>
-                    </Button>
-
-                    <Button variant="flat" isDisabled>
-                      <span className="flex items-center gap-2">
-                        <HugeiconsIcon
-                          icon={Comment01Icon}
-                          strokeWidth={2}
-                          className="size-5"
-                        />
-                        <span>{commentCount}</span>
-                      </span>
-                    </Button>
-
+              <ScrollShadow hideScrollBar className="max-h-[60vh]">
+                {isLoading ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-72 w-full rounded-2xl" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ) : isError ? (
+                  <StateMessage
+                    title="Can't open meme"
+                    description="Failed to load meme details."
+                    className="mt-0"
+                  />
+                ) : (
+                  <div className="space-y-4">
                     {imageUrl ? (
-                      <Button color="primary" as="a" href={imageUrl} download>
-                        <span className="flex items-center gap-2">
-                          <HugeiconsIcon
-                            icon={Download04Icon}
-                            strokeWidth={2}
-                            className="size-5"
-                          />
-                          <span>Download</span>
-                        </span>
-                      </Button>
+                      <div className="overflow-hidden rounded-2xl">
+                        <img
+                          src={imageUrl}
+                          alt={caption}
+                          className="w-full object-contain"
+                        />
+                      </div>
                     ) : null}
 
-                    {isOwner ? (
+                    <div className="flex flex-wrap items-center gap-3">
                       <Button
-                        color="danger"
-                        variant="flat"
-                        isPending={deleteMutation.isPending}
-                        onPress={() => deleteMutation.mutate()}
+                        size="sm"
+                        variant="ghost"
+                        color={hasLiked ? "danger" : "default"}
+                        isDisabled={!user || likeMutation.isPending}
+                        onPress={() => likeMutation.mutate()}
                       >
                         <span className="flex items-center gap-2">
                           <HugeiconsIcon
-                            icon={TrashIcon}
+                            icon={FavouriteIcon}
+                            strokeWidth={2}
+                            className={
+                              hasLiked
+                                ? "size-5 text-danger fill-current"
+                                : "size-5"
+                            }
+                          />
+                          <span className={hasLiked ? "text-danger" : ""}>
+                            {likeCount}
+                          </span>
+                        </span>
+                      </Button>
+
+                      <Button size="sm" variant="ghost" isDisabled>
+                        <span className="flex items-center gap-2 text-muted-foreground">
+                          <HugeiconsIcon
+                            icon={Comment01Icon}
                             strokeWidth={2}
                             className="size-5"
                           />
-                          <span>Delete</span>
+                          <span>{commentCount}</span>
                         </span>
                       </Button>
-                    ) : null}
-                  </div>
 
-                  <Separator />
+                      {imageUrl ? (
+                        <Button
+                          size="sm"
+                          color="primary"
+                          as="a"
+                          href={imageUrl}
+                          download
+                        >
+                          <span className="flex items-center gap-2">
+                            <HugeiconsIcon
+                              icon={Download04Icon}
+                              strokeWidth={2}
+                              className="size-5"
+                            />
+                            <span>Download</span>
+                          </span>
+                        </Button>
+                      ) : null}
 
-                  <div className="space-y-4">
-                    <div className="text-sm font-semibold">Comments</div>
+                      {isOwner ? (
+                        <Button
+                          size="sm"
+                          variant="danger-soft"
+                          isPending={deleteMutation.isPending}
+                          onPress={() => deleteMutation.mutate()}
+                        >
+                          <span className="flex items-center gap-2">
+                            <HugeiconsIcon
+                              icon={TrashIcon}
+                              strokeWidth={2}
+                              className="size-5"
+                            />
+                            <span>Delete</span>
+                          </span>
+                        </Button>
+                      ) : null}
+                    </div>
 
-                    {comments.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">
-                        No comments yet.
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {comments.map((c) => (
-                          <div
-                            key={c.id}
-                            className="rounded-xl border border-divider p-3"
-                          >
-                            <div className="text-xs text-muted-foreground">
-                              @{c.author}
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <div className="text-sm font-semibold">Comments</div>
+
+                      {comments.length === 0 ? (
+                        <div className="text-sm text-muted-foreground">
+                          No comments yet.
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {comments.map((c) => (
+                            <div
+                              key={c.id}
+                              className="rounded-xl border border-divider p-3"
+                            >
+                              <div className="text-xs text-muted-foreground">
+                                @{c.author}
+                              </div>
+                              <div className="mt-1 text-sm">{c.text}</div>
                             </div>
-                            <div className="mt-1 text-sm">{c.text}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
 
-                    <TextField
-                      name="comment"
-                      onChange={setCommentText}
-                      isDisabled={!user || commentMutation.isPending}
-                      className="rounded-xl border-b"
-                    >
-                      <Label>Add comment</Label>
-                      <InputGroup className="h-12 text-base">
-                        <InputGroup.Input
-                          className="w-full px-4 text-base"
-                          placeholder={
-                            user ? "Write a comment..." : "Login to comment"
-                          }
-                          value={commentText}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && canSubmitComment) {
-                              commentMutation.mutate();
+                      <TextField
+                        name="comment"
+                        onChange={setCommentText}
+                        isDisabled={!user || commentMutation.isPending}
+                        className="rounded-xl border-b"
+                      >
+                        <Label>Add comment</Label>
+                        <InputGroup className="h-12 text-base">
+                          <InputGroup.Input
+                            className="w-full px-4 text-base"
+                            placeholder={
+                              user ? "Write a comment..." : "Login to comment"
                             }
-                          }}
-                        />
-                      </InputGroup>
-                    </TextField>
+                            value={commentText}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && canSubmitComment) {
+                                commentMutation.mutate();
+                              }
+                            }}
+                          />
+                        </InputGroup>
+                      </TextField>
 
-                    <Button
-                      color="primary"
-                      isDisabled={!canSubmitComment || !user}
-                      isPending={commentMutation.isPending}
-                      onPress={() => commentMutation.mutate()}
-                    >
-                      <span className="flex items-center gap-2">
-                        <HugeiconsIcon
-                          icon={SentIcon}
-                          strokeWidth={2}
-                          className="size-5"
-                        />
-                        <span>Post comment</span>
-                      </span>
-                    </Button>
+                      <Button
+                        size="sm"
+                        color="primary"
+                        isDisabled={!canSubmitComment || !user}
+                        isPending={commentMutation.isPending}
+                        onPress={() => commentMutation.mutate()}
+                      >
+                        <span className="flex items-center gap-2">
+                          <HugeiconsIcon
+                            icon={SentIcon}
+                            strokeWidth={2}
+                            className="size-5"
+                          />
+                          <span>Post comment</span>
+                        </span>
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </ScrollShadow>
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="flat" onPress={onClose}>
+              <Button
+                size="sm"
+                variant="tertiary"
+                color="default"
+                onPress={onClose}
+              >
                 <span className="flex items-center gap-2">
                   <HugeiconsIcon
                     icon={Cancel01Icon}

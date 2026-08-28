@@ -9,7 +9,14 @@ import { AuthContext } from "@/hooks/auth";
 const AUTH_POLL_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem("gg_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -19,6 +26,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const userData = await authService.getMe();
       setUser(userData);
+      localStorage.setItem("gg_user", JSON.stringify(userData));
     } catch {
       // 401 is handled by the axios response interceptor
     }
@@ -29,8 +37,22 @@ export const AuthProvider = ({ children }) => {
       try {
         const userData = await authService.getMe();
         setUser(userData);
-      } catch {
-        // Not logged in
+        localStorage.setItem("gg_user", JSON.stringify(userData));
+      } catch (err) {
+        const isNetworkError = !err?.response;
+        if (isNetworkError) {
+          try {
+            const userData = await authService.getMe();
+            setUser(userData);
+            localStorage.setItem("gg_user", JSON.stringify(userData));
+          } catch {
+            setUser(null);
+            localStorage.removeItem("gg_user");
+          }
+        } else {
+          setUser(null);
+          localStorage.removeItem("gg_user");
+        }
       } finally {
         setLoading(false);
       }
@@ -63,6 +85,7 @@ export const AuthProvider = ({ children }) => {
       queryClient.clear();
 
       setUser(userData);
+      localStorage.setItem("gg_user", JSON.stringify(userData));
       toast.success(`Welcome back, ${userData.username}!`);
       navigate("/", { replace: true });
 
@@ -84,6 +107,7 @@ export const AuthProvider = ({ children }) => {
       queryClient.clear();
 
       setUser(userData);
+      localStorage.setItem("gg_user", JSON.stringify(userData));
       toast.success(`Welcome, ${userData.username}!`);
       navigate("/", { replace: true });
 
@@ -105,6 +129,7 @@ export const AuthProvider = ({ children }) => {
       queryClient.clear();
 
       setUser(null);
+      localStorage.removeItem("gg_user");
       toast.success("You have been logged out successfully. See you soon!");
       navigate("/login", { replace: true });
     } catch (error) {

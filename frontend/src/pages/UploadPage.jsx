@@ -10,7 +10,6 @@ import {
 } from "@heroui/react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/auth";
 import StateMessage from "@/components/ui/StateMessage";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -26,7 +25,6 @@ const UploadPage = () => {
   useDocumentTitle("Upload");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   const [caption, setCaption] = useState("");
   const [file, setFile] = useState(null);
@@ -105,7 +103,7 @@ const UploadPage = () => {
 
           <div className="space-y-2">
             <Label>Meme image</Label>
-            <div className="flex flex-col gap-3 rounded-xl border border-dashed border-divider p-4">
+            <div className="flex flex-col gap-3 rounded-xl border border-dashed border-white/8 p-4">
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <HugeiconsIcon
                   icon={Image02Icon}
@@ -113,15 +111,17 @@ const UploadPage = () => {
                   className="size-5"
                 />
                 <span>
-                  {file ? file.name : "Choose a JPG/PNG image (max 5MB)"}
+                  {file
+                    ? file.name
+                    : "Choose a JPG, PNG, or GIF image (max 5MB)"}
                 </span>
               </div>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/gif,image/webp"
                 disabled={submitting}
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-default file:px-4 file:py-2 file:text-default-foreground hover:file:opacity-90"
+                className="block w-full cursor-pointer text-sm text-muted-foreground file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-default file:px-4 file:py-2 file:text-default-foreground hover:file:opacity-90"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ const UploadPage = () => {
 
           <Button
             fullWidth
-            variant="ghost"
+            variant="secondary"
             onPress={() => navigate("/")}
             isDisabled={submitting}
           >

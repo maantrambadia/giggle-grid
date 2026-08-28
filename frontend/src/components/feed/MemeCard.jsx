@@ -1,18 +1,52 @@
-import { Card } from "@heroui/react";
+import { useMemo } from "react";
+import { Card, Button } from "@heroui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FavouriteIcon, Comment01Icon } from "@hugeicons/core-free-icons";
+import { useAuth } from "@/hooks/auth";
+import { toggleLike } from "@/services/memeService";
 
 const MemeCard = ({ meme, onOpen }) => {
-  const likes = meme.likeCount ?? meme.likes ?? 0;
-  const comments = meme.commentCount ?? meme.comments ?? 0;
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const likes = meme.likeCount ?? 0;
+  const comments = meme.commentCount ?? 0;
+
+  const isLiked = useMemo(() => !!meme.hasUserLiked, [meme.hasUserLiked]);
+
+  const likeMutation = useMutation({
+    mutationFn: () => toggleLike(meme.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["memes"] });
+      queryClient.invalidateQueries({ queryKey: ["meme", meme.id] });
+    },
+  });
+
+  const handleOpen = () => onOpen(meme);
+
+  const handleLike = (e) => {
+    e.stopPropagation();
+    if (!user) return;
+    likeMutation.mutate();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleOpen();
+    }
+  };
 
   return (
     <Card variant="secondary" className="h-full overflow-hidden">
-      <div className="p-4">
-        <button
-          type="button"
-          className="block w-full text-left"
-          onClick={() => onOpen(meme)}
+      <div className="p-2">
+        <div
+          className="cursor-pointer text-left"
+          onClick={handleOpen}
+          onKeyDown={handleKeyDown}
+          role="button"
+          tabIndex={0}
         >
           <div className="relative overflow-hidden rounded-2xl">
             <img
@@ -34,26 +68,47 @@ const MemeCard = ({ meme, onOpen }) => {
               {meme.caption}
             </p>
 
-            <div className="mt-4 flex items-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <HugeiconsIcon
-                  icon={FavouriteIcon}
-                  strokeWidth={2}
-                  className="size-5"
-                />
-                {likes}
-              </div>
-              <div className="flex items-center gap-1">
-                <HugeiconsIcon
-                  icon={Comment01Icon}
-                  strokeWidth={2}
-                  className="size-5"
-                />
-                {comments}
-              </div>
+            <div className="mt-4 flex items-center gap-6 text-sm">
+              <Button
+                size="sm"
+                variant="ghost"
+                color={isLiked ? "danger" : "default"}
+                isDisabled={!user || likeMutation.isPending}
+                onClick={handleLike}
+              >
+                <span className="flex items-center gap-2">
+                  <HugeiconsIcon
+                    icon={FavouriteIcon}
+                    strokeWidth={2}
+                    className={
+                      isLiked
+                        ? "size-5 text-danger fill-current"
+                        : "size-5 text-muted-foreground"
+                    }
+                  />
+                  <span
+                    className={
+                      isLiked ? "text-danger" : "text-muted-foreground"
+                    }
+                  >
+                    {likes}
+                  </span>
+                </span>
+              </Button>
+
+              <Button size="sm" variant="ghost" isDisabled>
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <HugeiconsIcon
+                    icon={Comment01Icon}
+                    strokeWidth={2}
+                    className="size-5"
+                  />
+                  <span>{comments}</span>
+                </span>
+              </Button>
             </div>
           </div>
-        </button>
+        </div>
       </div>
     </Card>
   );
