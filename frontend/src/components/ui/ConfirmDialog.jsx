@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertDialog, Button } from "@heroui/react";
+import { useState } from "react";
+import { AlertDialog, Button, Spinner } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 const ConfirmDialog = ({
@@ -13,8 +14,22 @@ const ConfirmDialog = ({
   cancelText = "Cancel",
   confirmColor = "danger",
   confirmIcon,
-  isPending = false,
+  isPending: parentPending = false,
 }) => {
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsConfirming(true);
+    try {
+      await Promise.resolve(onConfirm());
+    } finally {
+      setIsConfirming(false);
+      onOpenChange(false);
+    }
+  };
+
+  const pending = parentPending || isConfirming;
+
   return (
     <AlertDialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <Button className="hidden" />
@@ -30,26 +45,28 @@ const ConfirmDialog = ({
               <p>{description}</p>
             </AlertDialog.Body>
             <AlertDialog.Footer>
-              <Button slot="close" variant="tertiary" isDisabled={isPending}>
+              <Button slot="close" variant="tertiary" isDisabled={pending}>
                 {cancelText}
               </Button>
               <Button
-                slot="close"
                 color={confirmColor}
-                isPending={isPending}
-                onPress={() => onConfirm()}
+                isPending={pending}
+                isDisabled={pending}
+                onPress={handleConfirm}
               >
-                {confirmIcon ? (
+                {({ isPending }) => (
                   <span className="flex items-center gap-2">
-                    <HugeiconsIcon
-                      icon={confirmIcon}
-                      strokeWidth={2}
-                      className="size-5"
-                    />
+                    {isPending ? (
+                      <Spinner color="current" size="sm" />
+                    ) : confirmIcon ? (
+                      <HugeiconsIcon
+                        icon={confirmIcon}
+                        strokeWidth={2}
+                        className="size-5"
+                      />
+                    ) : null}
                     <span>{confirmText}</span>
                   </span>
-                ) : (
-                  confirmText
                 )}
               </Button>
             </AlertDialog.Footer>
