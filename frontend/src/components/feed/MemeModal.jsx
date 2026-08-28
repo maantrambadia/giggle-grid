@@ -92,12 +92,14 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
   const handleDownload = async () => {
     if (!imageUrl) return;
 
+    const relativeUrl =
+      imageUrl.indexOf("/uploads/") >= 0
+        ? imageUrl.substring(imageUrl.indexOf("/uploads/"))
+        : imageUrl;
+
     setIsDownloading(true);
     try {
-      const response = await fetch(imageUrl, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(relativeUrl);
 
       if (!response.ok) {
         throw new Error("Failed to fetch image.");
@@ -108,7 +110,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = imageUrl.split("/").pop() || "meme.jpg";
+      link.download = relativeUrl.split("/").pop() || "meme.jpg";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
