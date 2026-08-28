@@ -11,6 +11,7 @@ import {
   SentIcon,
   Image02Icon,
 } from "@hugeicons/core-free-icons";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 import FeedHeader from "@/components/feed/FeedHeader";
 import MemeSkeletonGrid from "@/components/feed/MemeSkeletonGrid";
@@ -24,6 +25,7 @@ const sortByLikesDesc = (a, b) => {
 };
 
 const FeedPage = () => {
+  useDocumentTitle("Feed");
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isTrending, setIsTrending] = useState(false);

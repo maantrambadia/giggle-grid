@@ -15,7 +15,7 @@ import {
   UserAdd01Icon,
   UserIcon,
   SquareLockPasswordIcon,
-  ArrowLeft01Icon,
+  ImageCompositionOvalIcon,
 } from "@hugeicons/core-free-icons";
 import StateMessage from "@/components/ui/StateMessage";
 import { useAuth } from "@/hooks/auth";
@@ -201,7 +201,7 @@ const RegisterPage = () => {
           >
             <span className="flex items-center justify-center gap-2">
               <HugeiconsIcon
-                icon={ArrowLeft01Icon}
+                icon={ImageCompositionOvalIcon}
                 strokeWidth={2}
                 className="size-5"
               />

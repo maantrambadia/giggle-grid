@@ -17,7 +17,7 @@ import {
   Upload04Icon,
   Image02Icon,
   TextIcon,
-  ArrowLeft01Icon,
+  ImageCompositionOvalIcon,
 } from "@hugeicons/core-free-icons";
 import api from "@/lib/axios";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
@@ -167,7 +167,7 @@ const UploadPage = () => {
           >
             <span className="flex items-center justify-center gap-2">
               <HugeiconsIcon
-                icon={ArrowLeft01Icon}
+                icon={ImageCompositionOvalIcon}
                 strokeWidth={2}
                 className="size-5"
               />

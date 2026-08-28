@@ -15,7 +15,7 @@ import {
   Login01Icon,
   UserIcon,
   SquareLockPasswordIcon,
-  ArrowLeft01Icon,
+  ImageCompositionOvalIcon,
 } from "@hugeicons/core-free-icons";
 import { useAuth } from "@/hooks/auth";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
@@ -147,7 +147,7 @@ const LoginPage = () => {
           >
             <span className="flex items-center justify-center gap-2">
               <HugeiconsIcon
-                icon={ArrowLeft01Icon}
+                icon={ImageCompositionOvalIcon}
                 strokeWidth={2}
                 className="size-5"
               />
