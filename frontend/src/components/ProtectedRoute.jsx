@@ -17,3 +17,17 @@ export const ProtectedRoute = () => {
 
   return <Outlet />;
 };
+
+export const GuestRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
