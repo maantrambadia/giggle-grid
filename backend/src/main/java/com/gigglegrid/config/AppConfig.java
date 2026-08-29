@@ -18,12 +18,23 @@ public class AppConfig {
 
     @Bean
     public DataSource dataSource() {
+        String host = env("DB_HOST", "localhost");
+        String port = env("DB_PORT", "3306");
+        String name = env("DB_NAME", "gigglegrid");
+        String user = env("DB_USER", "root");
+        String pass = env("DB_PASSWORD", "");
+
         DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setUrl("jdbc:mariadb://localhost:3306/gigglegrid");
-        ds.setUsername("root");
-        ds.setPassword("");
+        ds.setUrl("jdbc:mariadb://" + host + ":" + port + "/" + name);
+        ds.setUsername(user);
+        ds.setPassword(pass);
         ds.setDriverClassName("org.mariadb.jdbc.Driver");
         return ds;
+    }
+
+    private static String env(String key, String fallback) {
+        String v = System.getenv(key);
+        return v == null || v.trim().isEmpty() ? fallback : v.trim();
     }
 
     @Bean
