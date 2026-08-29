@@ -122,7 +122,7 @@ const FeedPage = () => {
           />
         )}
 
-        <footer className="mt-auto py-4 text-center text-sm text-muted-foreground">
+        <footer className="py-4 text-center text-sm text-muted">
           © {new Date().getFullYear()} GiggleGrid. Built for laughs.
         </footer>
       </main>
