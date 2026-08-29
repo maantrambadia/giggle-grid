@@ -20,10 +20,10 @@ const FeedHeader = ({
             draggable={false}
           />
           <div className="min-w-0">
-            <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-              Fresh memes
+            <h2 className="text-accent text-xl font-semibold sm:text-2xl">
+              GiggleGrid
             </h2>
-            <p className="text-xs text-muted-foreground sm:text-sm">
+            <p className="text-xs text-muted sm:text-sm">
               Browse the grid. Login to upload, like, and comment.
             </p>
             {user ? (
