@@ -1,10 +1,12 @@
 import { ScrollShadow } from "@heroui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "motion/react";
 import MemeCard from "@/components/feed/MemeCard";
 
 const PAGE_SIZE = 9;
 
 const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
+  const MotionDiv = motion.div;
   const scrollerRef = useRef(null);
   const hasReset = useRef(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -42,14 +44,26 @@ const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
     <ScrollShadow
       ref={scrollerRef}
       hideScrollBar
-      className="mt-3 max-h-[calc(100dvh-140px)] sm:mt-6 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc(100dvh-220px)]"
+      size="40"
+      className="mt-3 max-h-[calc(100dvh-140px)] sm:mt-6 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc
+(100dvh-220px)]"
       onScroll={handleScroll}
     >
-      <div className="grid gap-6 pb-1 sm:pb-4 sm:grid-cols-2 lg:grid-cols-3">
+      <MotionDiv
+        layout
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        className="grid gap-6 pb-1 sm:pb-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {visible.map((meme) => (
-          <MemeCard key={meme.id} meme={meme} onOpen={onOpen} />
+          <MotionDiv
+            key={meme.id}
+            layout
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            <MemeCard meme={meme} onOpen={onOpen} />
+          </MotionDiv>
         ))}
-      </div>
+      </MotionDiv>
     </ScrollShadow>
   );
 };
