@@ -86,11 +86,11 @@ const FeedPage = () => {
         />
 
         {isLoading ? (
-          <div className="mt-6 flex-1">
+          <div className="mt-6">
             <MemeSkeletonGrid count={9} />
           </div>
         ) : isError ? (
-          <div className="mt-10 flex flex-1 justify-center">
+          <div className="mt-10 flex justify-center">
             <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
               <HugeiconsIcon
                 icon={Alert02Icon}
@@ -104,7 +104,7 @@ const FeedPage = () => {
             </div>
           </div>
         ) : list.length === 0 ? (
-          <div className="mt-10 flex flex-1 justify-center">
+          <div className="mt-10 flex justify-center">
             <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
               <HugeiconsIcon
                 icon={Image02Icon}
@@ -122,7 +122,7 @@ const FeedPage = () => {
           />
         )}
 
-        <footer className="py-4 text-center text-sm text-muted">
+        <footer className="mt-auto py-4 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} GiggleGrid. Built for laughs.
         </footer>
       </main>
