@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.gigglegrid</groupId>
     <artifactId>giggle-grid-backend</artifactId>
-    <version>0.0.0</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
 
     <properties>
