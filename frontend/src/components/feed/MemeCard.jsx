@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Card, Button } from "@heroui/react";
+import { Card, Button, Spinner } from "@heroui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FavouriteIcon, Comment01Icon } from "@hugeicons/core-free-icons";
@@ -17,7 +17,39 @@ const MemeCard = ({ meme, onOpen }) => {
 
   const likeMutation = useMutation({
     mutationFn: () => toggleLike(meme.id),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["memes"] });
+      await queryClient.cancelQueries({ queryKey: ["meme", meme.id] });
+
+      const previousMemes = queryClient.getQueryData(["memes"]);
+      const previousMeme = queryClient.getQueryData(["meme", meme.id]);
+
+      const liked = isLiked;
+      const updater = (m) => {
+        if (!m || m.id !== meme.id) return m;
+        return {
+          ...m,
+          hasUserLiked: !liked,
+          likeCount: (m.likeCount ?? 0) + (liked ? -1 : 1),
+        };
+      };
+
+      queryClient.setQueryData(["memes"], (old) =>
+        Array.isArray(old) ? old.map(updater) : old,
+      );
+      queryClient.setQueryData(["meme", meme.id], (old) => updater(old));
+
+      return { previousMemes, previousMeme };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousMemes !== undefined) {
+        queryClient.setQueryData(["memes"], context.previousMemes);
+      }
+      if (context?.previousMeme !== undefined) {
+        queryClient.setQueryData(["meme", meme.id], context.previousMeme);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["memes"] });
       queryClient.invalidateQueries({ queryKey: ["meme", meme.id] });
     },
@@ -27,7 +59,7 @@ const MemeCard = ({ meme, onOpen }) => {
 
   const handleLike = (e) => {
     e.stopPropagation();
-    if (!user) return;
+    if (!user || likeMutation.isPending) return;
     likeMutation.mutate();
   };
 
@@ -74,27 +106,34 @@ const MemeCard = ({ meme, onOpen }) => {
                 size="sm"
                 variant="ghost"
                 color={isLiked ? "danger" : "default"}
-                isDisabled={!user || likeMutation.isPending}
+                isDisabled={!user}
+                isPending={likeMutation.isPending}
                 onClick={handleLike}
               >
-                <span className="flex items-center gap-2">
-                  <HugeiconsIcon
-                    icon={FavouriteIcon}
-                    strokeWidth={2}
-                    className={
-                      isLiked
-                        ? "size-5 text-danger fill-current"
-                        : "size-5 text-muted-foreground"
-                    }
-                  />
-                  <span
-                    className={
-                      isLiked ? "text-danger" : "text-muted-foreground"
-                    }
-                  >
-                    {likes}
+                {({ isPending }) => (
+                  <span className="flex items-center gap-2">
+                    {isPending ? (
+                      <Spinner color="current" size="sm" />
+                    ) : (
+                      <HugeiconsIcon
+                        icon={FavouriteIcon}
+                        strokeWidth={2}
+                        className={
+                          isLiked
+                            ? "size-5 text-danger fill-current"
+                            : "size-5 text-muted-foreground"
+                        }
+                      />
+                    )}
+                    <span
+                      className={
+                        isLiked ? "text-danger" : "text-muted-foreground"
+                      }
+                    >
+                      {likes}
+                    </span>
                   </span>
-                </span>
+                )}
               </Button>
 
               <Button size="sm" variant="ghost" isDisabled>

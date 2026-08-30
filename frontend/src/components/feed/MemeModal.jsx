@@ -3,6 +3,7 @@ import {
   Button,
   Modal,
   Skeleton,
+  Spinner,
   TextField,
   Label,
   InputGroup,
@@ -73,7 +74,39 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
   const likeMutation = useMutation({
     mutationFn: () => toggleLike(memeId),
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["memes"] });
+      await queryClient.cancelQueries({ queryKey: ["meme", memeId] });
+
+      const previousMemes = queryClient.getQueryData(["memes"]);
+      const previousMeme = queryClient.getQueryData(["meme", memeId]);
+
+      const liked = hasLiked;
+      const updater = (m) => {
+        if (!m || m.id !== memeId) return m;
+        return {
+          ...m,
+          hasUserLiked: !liked,
+          likeCount: (m.likeCount ?? 0) + (liked ? -1 : 1),
+        };
+      };
+
+      queryClient.setQueryData(["memes"], (old) =>
+        Array.isArray(old) ? old.map(updater) : old,
+      );
+      queryClient.setQueryData(["meme", memeId], (old) => updater(old));
+
+      return { previousMemes, previousMeme };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousMemes !== undefined) {
+        queryClient.setQueryData(["memes"], context.previousMemes);
+      }
+      if (context?.previousMeme !== undefined) {
+        queryClient.setQueryData(["meme", memeId], context.previousMeme);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["meme", memeId] });
       queryClient.invalidateQueries({ queryKey: ["memes"] });
     },
@@ -207,23 +240,30 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                           size="sm"
                           variant="ghost"
                           color={hasLiked ? "danger" : "default"}
-                          isDisabled={!user || likeMutation.isPending}
+                          isDisabled={!user}
+                          isPending={likeMutation.isPending}
                           onPress={() => likeMutation.mutate()}
                         >
-                          <span className="flex items-center gap-2">
-                            <HugeiconsIcon
-                              icon={FavouriteIcon}
-                              strokeWidth={2}
-                              className={
-                                hasLiked
-                                  ? "size-5 text-danger fill-current"
-                                  : "size-5"
-                              }
-                            />
-                            <span className={hasLiked ? "text-danger" : ""}>
-                              {likeCount}
+                          {({ isPending }) => (
+                            <span className="flex items-center gap-2">
+                              {isPending ? (
+                                <Spinner color="current" size="sm" />
+                              ) : (
+                                <HugeiconsIcon
+                                  icon={FavouriteIcon}
+                                  strokeWidth={2}
+                                  className={
+                                    hasLiked
+                                      ? "size-5 text-danger fill-current"
+                                      : "size-5"
+                                  }
+                                />
+                              )}
+                              <span className={hasLiked ? "text-danger" : ""}>
+                                {likeCount}
+                              </span>
                             </span>
-                          </span>
+                          )}
                         </Button>
 
                         <Button size="sm" variant="ghost" isDisabled>
