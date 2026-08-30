@@ -15,8 +15,20 @@ public class UserService {
 
     @Transactional
     public User register(String username, String password) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username is required.");
+        }
+        if (username.trim().length() < 3) {
+            throw new IllegalArgumentException("Username must be at least 3 characters.");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password is required.");
+        }
+        if (password.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters.");
+        }
         if (userDao.findByUsername(username) != null) {
-            throw new RuntimeException("Username already taken.");
+            throw new IllegalArgumentException("Username already taken.");
         }
         User user = new User();
         user.setUsername(username);

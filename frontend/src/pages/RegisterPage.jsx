@@ -37,11 +37,36 @@ const RegisterPage = () => {
     confirmPassword.length > 0 &&
     password.length > 0 &&
     password !== confirmPassword;
+  const usernameTooShort =
+    username.trim().length > 0 && username.trim().length < 3;
+  const passwordTooShort = password.length > 0 && password.length < 6;
+
+  const validationMessage = useMemo(() => {
+    if (displayedPasswordMismatch) {
+      return {
+        title: "Passwords do not match",
+        description: "Please enter the same password in both fields.",
+      };
+    }
+    if (passwordTooShort) {
+      return {
+        title: "Password is too short",
+        description: "Password must be at least 6 characters.",
+      };
+    }
+    if (usernameTooShort) {
+      return {
+        title: "Username is too short",
+        description: "Username must be at least 3 characters.",
+      };
+    }
+    return null;
+  }, [displayedPasswordMismatch, passwordTooShort, usernameTooShort]);
 
   const canSubmit = useMemo(() => {
     return (
-      username.trim().length > 0 &&
-      password.length > 0 &&
+      username.trim().length >= 3 &&
+      password.length >= 6 &&
       !passwordMismatch &&
       !submitting
     );
@@ -160,10 +185,10 @@ const RegisterPage = () => {
             </InputGroup>
           </TextField>
 
-          {displayedPasswordMismatch ? (
+          {validationMessage ? (
             <StateMessage
-              title="Passwords do not match"
-              description="Please enter the same password in both fields."
+              title={validationMessage.title}
+              description={validationMessage.description}
               className="mt-0"
             />
           ) : null}

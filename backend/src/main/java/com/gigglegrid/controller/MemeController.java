@@ -103,6 +103,12 @@ public class MemeController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid session."));
         }
+        if (caption == null || caption.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Caption is required."));
+        }
+        if (caption.trim().length() > 500) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Caption must be 500 characters or less."));
+        }
         if (image == null || image.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Image is required."));
         }

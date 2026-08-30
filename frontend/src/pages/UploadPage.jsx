@@ -28,12 +28,48 @@ const UploadPage = () => {
 
   const [caption, setCaption] = useState("");
   const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+  const captionError =
+    caption.trim().length > 500
+      ? "Caption must be 500 characters or less."
+      : "";
+
   const canSubmit = useMemo(() => {
-    return caption.trim().length > 0 && !!file && !submitting;
-  }, [caption, file, submitting]);
+    return (
+      caption.trim().length > 0 &&
+      caption.trim().length <= 500 &&
+      !!file &&
+      !fileError &&
+      !submitting
+    );
+  }, [caption, file, fileError, submitting]);
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0] || null;
+    if (!selected) {
+      setFile(null);
+      setFileError("");
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(selected.type)) {
+      setFile(null);
+      setFileError("Only JPG, PNG, GIF, or WEBP images are allowed.");
+      return;
+    }
+    if (selected.size > MAX_FILE_SIZE) {
+      setFile(null);
+      setFileError("Image must be 5 MB or smaller.");
+      return;
+    }
+    setFile(selected);
+    setFileError("");
+  };
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -120,11 +156,27 @@ const UploadPage = () => {
                 type="file"
                 accept="image/jpeg,image/png,image/gif,image/webp"
                 disabled={submitting}
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                onChange={handleFileChange}
                 className="block w-full cursor-pointer text-sm text-muted-foreground file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-default file:px-4 file:py-2 file:text-default-foreground hover:file:opacity-90"
               />
             </div>
           </div>
+
+          {captionError ? (
+            <StateMessage
+              title="Caption is too long"
+              description={captionError}
+              className="mt-0"
+            />
+          ) : null}
+
+          {fileError ? (
+            <StateMessage
+              title="Invalid image"
+              description={fileError}
+              className="mt-0"
+            />
+          ) : null}
 
           {error ? (
             <StateMessage

@@ -86,8 +86,11 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
     },
   });
 
+  const commentTooLong = commentText.trim().length > 1000;
   const canSubmitComment =
-    commentText.trim().length > 0 && !commentMutation.isPending;
+    commentText.trim().length > 0 &&
+    !commentTooLong &&
+    !commentMutation.isPending;
 
   const handleDownload = async () => {
     if (!imageUrl) return;
@@ -312,6 +315,14 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                             />
                           </InputGroup>
                         </TextField>
+
+                        {commentTooLong ? (
+                          <StateMessage
+                            title="Comment is too long"
+                            description="Comments must be 1000 characters or less."
+                            className="mt-0"
+                          />
+                        ) : null}
 
                         <Button
                           size="sm"

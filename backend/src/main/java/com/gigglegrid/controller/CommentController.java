@@ -49,6 +49,9 @@ public class CommentController {
         if (text == null || text.trim().isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Comment text is required."));
         }
+        if (text.trim().length() > 1000) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Comment must be 1000 characters or less."));
+        }
         Comment comment = commentService.addComment(id, user, text.trim());
         Map<String, Object> map = new java.util.HashMap<>();
         map.put("id", comment.getId());
