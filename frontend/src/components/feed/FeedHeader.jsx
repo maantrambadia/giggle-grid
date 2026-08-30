@@ -22,13 +22,15 @@ const FeedHeader = ({
           <div className="min-w-0">
             <h2 className="text-accent text-xl font-semibold sm:text-2xl">
               GiggleGrid
+              {user ? (
+                <span className="ml-2 inline-block max-w-[120px] truncate align-middle text-sm font-normal text-muted/70 sm:max-w-[160px]">
+                  @{user.username}
+                </span>
+              ) : null}
             </h2>
             <p className="text-xs text-muted sm:text-sm">
               Browse the grid. Login to upload, like, and comment.
             </p>
-            {user ? (
-              <p className="mt-0.5 text-sm text-muted/70">@{user.username}</p>
-            ) : null}
           </div>
         </div>
 
