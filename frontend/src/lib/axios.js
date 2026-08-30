@@ -21,7 +21,19 @@ api.interceptors.response.use(
     }
     return res;
   },
-  (err) => Promise.reject(err),
+  (err) => {
+    if (
+      err.response?.data &&
+      typeof err.response.data === "object" &&
+      "success" in err.response.data
+    ) {
+      const data = err.response.data;
+      const message = data.message || "Request failed.";
+      err.response.data = { error: message, ...data };
+      err.message = message;
+    }
+    return Promise.reject(err);
+  }
 );
 
 export default api;
