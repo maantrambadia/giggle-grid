@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Modal,
@@ -60,6 +60,16 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
   const [commentText, setCommentText] = useState("");
   const [showDelete, setShowDelete] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [displayedCommentTooLong, setDisplayedCommentTooLong] = useState(false);
+
+  const commentTooLong = commentText.trim().length > 1000;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisplayedCommentTooLong(commentTooLong);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [commentTooLong]);
 
   const likeMutation = useMutation({
     mutationFn: () => toggleLike(memeId),
@@ -86,7 +96,6 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
     },
   });
 
-  const commentTooLong = commentText.trim().length > 1000;
   const canSubmitComment =
     commentText.trim().length > 0 &&
     !commentTooLong &&
@@ -316,7 +325,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
                           </InputGroup>
                         </TextField>
 
-                        {commentTooLong ? (
+                        {displayedCommentTooLong ? (
                           <StateMessage
                             title="Comment is too long"
                             description="Comments must be 1000 characters or less."

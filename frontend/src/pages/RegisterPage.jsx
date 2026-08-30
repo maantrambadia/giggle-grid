@@ -32,6 +32,10 @@ const RegisterPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [displayedPasswordMismatch, setDisplayedPasswordMismatch] =
     useState(false);
+  const [displayedUsernameTooShort, setDisplayedUsernameTooShort] =
+    useState(false);
+  const [displayedPasswordTooShort, setDisplayedPasswordTooShort] =
+    useState(false);
 
   const passwordMismatch =
     confirmPassword.length > 0 &&
@@ -48,20 +52,24 @@ const RegisterPage = () => {
         description: "Please enter the same password in both fields.",
       };
     }
-    if (passwordTooShort) {
+    if (displayedPasswordTooShort) {
       return {
         title: "Password is too short",
         description: "Password must be at least 6 characters.",
       };
     }
-    if (usernameTooShort) {
+    if (displayedUsernameTooShort) {
       return {
         title: "Username is too short",
         description: "Username must be at least 3 characters.",
       };
     }
     return null;
-  }, [displayedPasswordMismatch, passwordTooShort, usernameTooShort]);
+  }, [
+    displayedPasswordMismatch,
+    displayedPasswordTooShort,
+    displayedUsernameTooShort,
+  ]);
 
   const canSubmit = useMemo(() => {
     return (
@@ -78,6 +86,14 @@ const RegisterPage = () => {
     }, 400);
     return () => clearTimeout(timer);
   }, [password, confirmPassword, passwordMismatch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisplayedUsernameTooShort(usernameTooShort);
+      setDisplayedPasswordTooShort(passwordTooShort);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [username, password, usernameTooShort, passwordTooShort]);
 
   const handleSubmit = async () => {
     if (!canSubmit) return;

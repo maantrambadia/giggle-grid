@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Spinner,
@@ -31,6 +31,7 @@ const UploadPage = () => {
   const [fileError, setFileError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [displayedCaptionError, setDisplayedCaptionError] = useState("");
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
@@ -39,6 +40,13 @@ const UploadPage = () => {
     caption.trim().length > 500
       ? "Caption must be 500 characters or less."
       : "";
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisplayedCaptionError(captionError);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [captionError]);
 
   const canSubmit = useMemo(() => {
     return (
@@ -162,10 +170,10 @@ const UploadPage = () => {
             </div>
           </div>
 
-          {captionError ? (
+          {displayedCaptionError ? (
             <StateMessage
               title="Caption is too long"
-              description={captionError}
+              description={displayedCaptionError}
               className="mt-0"
             />
           ) : null}
