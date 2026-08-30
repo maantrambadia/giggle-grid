@@ -1,3 +1,3 @@
 set -a
-. /var/www/giggle-grid/backend/.env
+. /var/www/personal-stuff/giggle-grid/backend/.env
 set +a
