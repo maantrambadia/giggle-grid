@@ -79,4 +79,10 @@
         <error-code>500</error-code>
         <location>/api/error</location>
     </error-page>
+
+    <session-config>
+        <cookie-config>
+            <path>/</path>
+        </cookie-config>
+    </session-config>
 </web-app>
