@@ -279,7 +279,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
 
                       <Separator />
 
-                      <div className="space-y-4">
+                      <div className="space-y-4 px-1">
                         <div className="text-sm font-semibold">Comments</div>
 
                         {comments.length === 0 ? (
