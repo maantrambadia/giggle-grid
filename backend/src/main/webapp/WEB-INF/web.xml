@@ -33,7 +33,7 @@
         <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
         <init-param>
             <param-name>cors.allowed.origins</param-name>
-            <param-value>http://localhost:5173,http://localhost:3000</param-value>
+            <param-value>https://gg.maantrambadia.com,http://gg.maantrambadia.com,http://localhost:5173,http://localhost:3000</param-value>
         </init-param>
         <init-param>
             <param-name>cors.allowed.methods</param-name>
