@@ -178,7 +178,23 @@ public class MemeController {
     }
 
     private String getBaseUrl(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        String scheme = (forwardedProto != null && !forwardedProto.isEmpty())
+                ? forwardedProto
+                : request.getScheme();
+
+        String host = request.getHeader("Host");
+        if (host == null || host.isEmpty()) {
+            host = request.getServerName() + ":" + request.getServerPort();
+        }
+
+        // Nginx proxies /uploads and /api to the backend, so in production
+        // the public root is the domain without the WAR context path.
+        String context = (forwardedProto != null && !forwardedProto.isEmpty())
+                ? ""
+                : request.getContextPath();
+
+        return scheme + "://" + host + context;
     }
 
     private Map<String, Object> mapMeme(Meme meme, String baseUrl, User currentUser) {
