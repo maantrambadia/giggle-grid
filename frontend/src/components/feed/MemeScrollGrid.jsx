@@ -45,7 +45,7 @@ const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
       ref={scrollerRef}
       hideScrollBar
       size="40"
-      className="max-h-[calc(100dvh-140px)] sm:mt-7 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc
+      className="mt-4 max-h-[calc(100dvh-156px)] sm:mt-7 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc
 (100dvh-220px)]"
       onScroll={handleScroll}
     >
