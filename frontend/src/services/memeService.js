@@ -1,6 +1,11 @@
 import api from "@/lib/axios";
 
-export const listMemes = () => api.get("/memes").then((r) => r.data);
+export const listMemes = (keyword) =>
+  api
+    .get("/memes", {
+      params: keyword ? { keyword } : undefined,
+    })
+    .then((r) => r.data);
 
 export const getMeme = (id) => api.get(`/memes/${id}`).then((r) => r.data);
 
