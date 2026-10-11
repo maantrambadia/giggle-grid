@@ -1,4 +1,4 @@
-import { Button, Separator } from "@heroui/react";
+import { Button, Separator, SearchField } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Upload04Icon, Fire02Icon } from "@hugeicons/core-free-icons";
 
@@ -8,6 +8,8 @@ const FeedHeader = ({
   isTrending = false,
   user,
   rightContent,
+  searchValue,
+  onSearchChange,
 }) => {
   return (
     <header className="pt-6">
@@ -34,37 +36,58 @@ const FeedHeader = ({
           </div>
         </div>
 
-        <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
-          <Button
-            className="flex-1 sm:flex-initial"
-            color="success"
-            onPress={onUpload}
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-end sm:gap-2">
+          <SearchField
+            name="search"
+            variant="secondary"
+            value={searchValue}
+            onChange={onSearchChange}
+            fullWidth
+            aria-label="Search memes"
           >
-            <span className="flex w-full items-center justify-center gap-2">
-              <HugeiconsIcon
-                icon={Upload04Icon}
-                strokeWidth={2}
-                className="size-5"
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input
+                className="w-full sm:w-[280px]"
+                placeholder="Search memes..."
+                aria-label="Search memes"
               />
-              <span>Upload</span>
-            </span>
-          </Button>
-          <Button
-            className="flex-1 sm:flex-initial"
-            variant={isTrending ? "solid" : "tertiary"}
-            color={isTrending ? "warning" : "default"}
-            onPress={onTrending}
-          >
-            <span className="flex w-full items-center justify-center gap-2">
-              <HugeiconsIcon
-                icon={Fire02Icon}
-                strokeWidth={2}
-                className="size-5"
-              />
-              <span>Trending</span>
-            </span>
-          </Button>
-          {rightContent}
+              <SearchField.ClearButton className="scale-110" />
+            </SearchField.Group>
+          </SearchField>
+
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
+            <Button
+              className="flex-1 sm:flex-initial"
+              color="success"
+              onPress={onUpload}
+            >
+              <span className="flex w-full items-center justify-center gap-2">
+                <HugeiconsIcon
+                  icon={Upload04Icon}
+                  strokeWidth={2}
+                  className="size-5"
+                />
+                <span>Upload</span>
+              </span>
+            </Button>
+            <Button
+              className="flex-1 sm:flex-initial"
+              variant={isTrending ? "solid" : "tertiary"}
+              color={isTrending ? "warning" : "default"}
+              onPress={onTrending}
+            >
+              <span className="flex w-full items-center justify-center gap-2">
+                <HugeiconsIcon
+                  icon={Fire02Icon}
+                  strokeWidth={2}
+                  className="size-5"
+                />
+                <span>Trending</span>
+              </span>
+            </Button>
+            {rightContent}
+          </div>
         </div>
       </div>
 
