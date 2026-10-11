@@ -91,7 +91,7 @@ const FeedHeader = ({
         </div>
       </div>
 
-      <Separator className="mt-6" />
+      <Separator className="mt-6 mb-4 sm:mb-7" />
     </header>
   );
 };

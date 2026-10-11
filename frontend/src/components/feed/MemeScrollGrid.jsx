@@ -1,14 +1,18 @@
-import { ScrollShadow } from "@heroui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import MemeCard from "@/components/feed/MemeCard";
 
 const PAGE_SIZE = 9;
 
-const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
+const MemeScrollGrid = ({
+  memes,
+  onOpen,
+  isTrending = false,
+  scrollContainerRef,
+}) => {
   const MotionDiv = motion.div;
-  const scrollerRef = useRef(null);
   const hasReset = useRef(false);
+  const sentinelRef = useRef(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const visible = useMemo(() => {
@@ -17,38 +21,33 @@ const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
 
   const hasMore = (memes || []).length > visibleCount;
 
-  const loadMore = () => {
-    if (!hasMore) return;
-    setVisibleCount((c) => Math.min(c + PAGE_SIZE, (memes || []).length));
-  };
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
 
-  const handleScroll = (e) => {
-    const el = e.currentTarget;
-    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 220;
-    if (nearBottom) loadMore();
-  };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((c) => Math.min(c + PAGE_SIZE, (memes || []).length));
+        }
+      },
+      { root: scrollContainerRef?.current ?? null, rootMargin: "300px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, memes, scrollContainerRef]);
 
   useEffect(() => {
     if (hasReset.current) {
       setVisibleCount(PAGE_SIZE);
-      scrollerRef.current?.scrollTo?.({
-        top: 0,
-        behavior: "smooth",
-      });
+      scrollContainerRef?.current?.scrollTo?.({ top: 0, behavior: "smooth" });
     } else {
       hasReset.current = true;
     }
-  }, [isTrending]);
+  }, [isTrending, scrollContainerRef]);
 
   return (
-    <ScrollShadow
-      ref={scrollerRef}
-      hideScrollBar
-      size="40"
-      className="mt-4 max-h-[calc(100dvh-156px)] sm:mt-7 sm:max-h-[calc(100dvh-200px)] lg:max-h-[calc
-(100dvh-220px)]"
-      onScroll={handleScroll}
-    >
+    <div>
       <MotionDiv
         layout
         transition={{ duration: 0.18, ease: "easeOut" }}
@@ -64,7 +63,11 @@ const MemeScrollGrid = ({ memes, onOpen, isTrending = false }) => {
           </MotionDiv>
         ))}
       </MotionDiv>
-    </ScrollShadow>
+
+      {hasMore ? (
+        <div ref={sentinelRef} aria-hidden className="h-1 w-full" />
+      ) : null}
+    </div>
   );
 };
 

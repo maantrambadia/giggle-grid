@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listMemes } from "@/services/memeService";
 import { useAuth } from "@/hooks/auth";
-import { Button } from "@heroui/react";
+import { Button, ScrollShadow } from "@heroui/react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Logout03Icon,
@@ -39,6 +39,7 @@ const FeedPage = () => {
   const [selected, setSelected] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchInput), 400);
@@ -80,97 +81,106 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4">
-        <FeedHeader
-          user={user}
-          onUpload={() => navigate(user ? "/upload" : "/login")}
-          onTrending={() => setIsTrending((v) => !v)}
-          isTrending={isTrending}
-          searchValue={searchInput}
-          onSearchChange={setSearchInput}
-          rightContent={
-            user ? (
-              <Button
-                className="flex-1 sm:flex-initial"
-                variant="danger-soft"
-                onPress={() => setShowLogout(true)}
-              >
-                <span className="flex w-full items-center justify-center gap-2">
-                  <HugeiconsIcon
-                    icon={Logout03Icon}
-                    strokeWidth={2}
-                    className="size-5"
-                  />
-                  <span className="sm:hidden">Logout</span>
-                </span>
-              </Button>
-            ) : null
-          }
-        />
-
-        <AnimatePresence mode="wait">
-          {showSkeleton ? (
-            <motion.div
-              key="loading"
-              initial={false}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="mt-6"
-            >
-              <MemeSkeletonGrid count={9} />
-            </motion.div>
-          ) : isError ? (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 320, damping: 30 }}
-              className="mt-10 flex justify-center"
-            >
-              <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
-                <HugeiconsIcon
-                  icon={Alert02Icon}
-                  strokeWidth={2}
-                  className="size-5 text-danger"
-                />
-                <span>Can’t load memes right now.</span>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key={`${keyword}::${list.length === 0 ? "empty" : "list"}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 320, damping: 30 }}
-            >
-              {list.length === 0 ? (
-                <div className="mt-10 flex justify-center">
-                  <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col overflow-hidden px-4">
+        <div className="shrink-0">
+          <FeedHeader
+            user={user}
+            onUpload={() => navigate(user ? "/upload" : "/login")}
+            onTrending={() => setIsTrending((v) => !v)}
+            isTrending={isTrending}
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            rightContent={
+              user ? (
+                <Button
+                  className="flex-1 sm:flex-initial"
+                  variant="danger-soft"
+                  onPress={() => setShowLogout(true)}
+                >
+                  <span className="flex w-full items-center justify-center gap-2">
                     <HugeiconsIcon
-                      icon={Image02Icon}
+                      icon={Logout03Icon}
                       strokeWidth={2}
                       className="size-5"
                     />
-                    <span>
-                      No memes found. Be the first one to upload a meme.
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <MemeScrollGrid
-                  memes={list}
-                  onOpen={openMeme}
-                  isTrending={isTrending}
-                />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                    <span className="sm:hidden">Logout</span>
+                  </span>
+                </Button>
+              ) : null
+            }
+          />
+        </div>
 
-        <footer className="py-4 text-center text-sm text-muted">
+        <ScrollShadow
+          ref={scrollRef}
+          hideScrollBar
+          size="40"
+          className="min-h-0 flex-1"
+        >
+          <AnimatePresence mode="wait">
+            {showSkeleton ? (
+              <motion.div
+                key="loading"
+                initial={false}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+              >
+                <MemeSkeletonGrid count={9} />
+              </motion.div>
+            ) : isError ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                className="flex justify-center"
+              >
+                <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+                  <HugeiconsIcon
+                    icon={Alert02Icon}
+                    strokeWidth={2}
+                    className="size-5 text-danger"
+                  />
+                  <span>Can’t load memes right now.</span>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`${keyword}::${list.length === 0 ? "empty" : "list"}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              >
+                {list.length === 0 ? (
+                  <div className="flex justify-center">
+                    <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+                      <HugeiconsIcon
+                        icon={Image02Icon}
+                        strokeWidth={2}
+                        className="size-5"
+                      />
+                      <span>
+                        No memes found. Be the first one to upload a meme.
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <MemeScrollGrid
+                    memes={list}
+                    onOpen={openMeme}
+                    isTrending={isTrending}
+                    scrollContainerRef={scrollRef}
+                  />
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </ScrollShadow>
+
+        <footer className="shrink-0 py-4 text-center text-sm text-muted">
           © {new Date().getFullYear()} GiggleGrid. Built for laughs.
         </footer>
       </main>
