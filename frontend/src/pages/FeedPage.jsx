@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listMemes } from "@/services/memeService";
@@ -33,18 +34,39 @@ const FeedPage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isTrending, setIsTrending] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput), 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const keyword = useMemo(() => debouncedSearch.trim(), [debouncedSearch]);
+
+  const [lastSuccessfulKeyword, setLastSuccessfulKeyword] = useState(null);
 
   const {
     data: memes,
     isLoading,
     isError,
+    isFetching,
   } = useQuery({
-    queryKey: ["memes"],
-    queryFn: listMemes,
+    queryKey: ["memes", { keyword }],
+    queryFn: () => listMemes(keyword),
+    onSuccess: () => {
+      setLastSuccessfulKeyword(keyword);
+    },
   });
+
+  const showSkeleton =
+    isLoading ||
+    (isFetching &&
+      lastSuccessfulKeyword !== null &&
+      keyword !== lastSuccessfulKeyword);
 
   const list = useMemo(() => {
     const arr = Array.isArray(memes) ? memes : [];
@@ -65,6 +87,8 @@ const FeedPage = () => {
           onUpload={() => navigate(user ? "/upload" : "/login")}
           onTrending={() => setIsTrending((v) => !v)}
           isTrending={isTrending}
+          searchValue={searchInput}
+          onSearchChange={setSearchInput}
           rightContent={
             user ? (
               <Button
@@ -85,42 +109,66 @@ const FeedPage = () => {
           }
         />
 
-        {isLoading ? (
-          <div className="mt-6">
-            <MemeSkeletonGrid count={9} />
-          </div>
-        ) : isError ? (
-          <div className="mt-10 flex justify-center">
-            <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
-              <HugeiconsIcon
-                icon={Alert02Icon}
-                strokeWidth={2}
-                className="size-5 text-danger"
-              />
-              <span>
-                Can’t load memes right now. Make sure Tomcat is running and
-                refresh.
-              </span>
-            </div>
-          </div>
-        ) : list.length === 0 ? (
-          <div className="mt-10 flex justify-center">
-            <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
-              <HugeiconsIcon
-                icon={Image02Icon}
-                strokeWidth={2}
-                className="size-5"
-              />
-              <span>No memes found. Be the first one to upload a meme.</span>
-            </div>
-          </div>
-        ) : (
-          <MemeScrollGrid
-            memes={list}
-            onOpen={openMeme}
-            isTrending={isTrending}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {showSkeleton ? (
+            <motion.div
+              key="loading"
+              initial={false}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="mt-6"
+            >
+              <MemeSkeletonGrid count={9} />
+            </motion.div>
+          ) : isError ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              className="mt-10 flex justify-center"
+            >
+              <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+                <HugeiconsIcon
+                  icon={Alert02Icon}
+                  strokeWidth={2}
+                  className="size-5 text-danger"
+                />
+                <span>Can’t load memes right now.</span>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`${keyword}::${list.length === 0 ? "empty" : "list"}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+            >
+              {list.length === 0 ? (
+                <div className="mt-10 flex justify-center">
+                  <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+                    <HugeiconsIcon
+                      icon={Image02Icon}
+                      strokeWidth={2}
+                      className="size-5"
+                    />
+                    <span>
+                      No memes found. Be the first one to upload a meme.
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <MemeScrollGrid
+                  memes={list}
+                  onOpen={openMeme}
+                  isTrending={isTrending}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <footer className="py-4 text-center text-sm text-muted">
           © {new Date().getFullYear()} GiggleGrid. Built for laughs.

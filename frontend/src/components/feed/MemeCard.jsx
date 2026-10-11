@@ -21,7 +21,7 @@ const MemeCard = ({ meme, onOpen }) => {
       await queryClient.cancelQueries({ queryKey: ["memes"] });
       await queryClient.cancelQueries({ queryKey: ["meme", meme.id] });
 
-      const previousMemes = queryClient.getQueryData(["memes"]);
+      const previousMemes = queryClient.getQueriesData({ queryKey: ["memes"] });
       const previousMeme = queryClient.getQueryData(["meme", meme.id]);
 
       const liked = isLiked;
@@ -34,7 +34,7 @@ const MemeCard = ({ meme, onOpen }) => {
         };
       };
 
-      queryClient.setQueryData(["memes"], (old) =>
+      queryClient.setQueriesData({ queryKey: ["memes"] }, (old) =>
         Array.isArray(old) ? old.map(updater) : old,
       );
       queryClient.setQueryData(["meme", meme.id], (old) => updater(old));
@@ -43,7 +43,9 @@ const MemeCard = ({ meme, onOpen }) => {
     },
     onError: (err, variables, context) => {
       if (context?.previousMemes !== undefined) {
-        queryClient.setQueryData(["memes"], context.previousMemes);
+        for (const [key, data] of context.previousMemes) {
+          queryClient.setQueryData(key, data);
+        }
       }
       if (context?.previousMeme !== undefined) {
         queryClient.setQueryData(["meme", meme.id], context.previousMeme);

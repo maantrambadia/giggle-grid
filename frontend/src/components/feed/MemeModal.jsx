@@ -78,7 +78,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
       await queryClient.cancelQueries({ queryKey: ["memes"] });
       await queryClient.cancelQueries({ queryKey: ["meme", memeId] });
 
-      const previousMemes = queryClient.getQueryData(["memes"]);
+      const previousMemes = queryClient.getQueriesData({ queryKey: ["memes"] });
       const previousMeme = queryClient.getQueryData(["meme", memeId]);
 
       const liked = hasLiked;
@@ -91,7 +91,7 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
         };
       };
 
-      queryClient.setQueryData(["memes"], (old) =>
+      queryClient.setQueriesData({ queryKey: ["memes"] }, (old) =>
         Array.isArray(old) ? old.map(updater) : old,
       );
       queryClient.setQueryData(["meme", memeId], (old) => updater(old));
@@ -100,7 +100,9 @@ const MemeModal = ({ isOpen, onClose, meme }) => {
     },
     onError: (err, variables, context) => {
       if (context?.previousMemes !== undefined) {
-        queryClient.setQueryData(["memes"], context.previousMemes);
+        for (const [key, data] of context.previousMemes) {
+          queryClient.setQueryData(key, data);
+        }
       }
       if (context?.previousMeme !== undefined) {
         queryClient.setQueryData(["meme", memeId], context.previousMeme);
