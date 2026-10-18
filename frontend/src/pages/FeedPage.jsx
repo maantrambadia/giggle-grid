@@ -81,7 +81,7 @@ const FeedPage = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col overflow-hidden px-4">
         <div className="shrink-0">
           <FeedHeader
