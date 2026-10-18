@@ -16,6 +16,8 @@ import {
   UserIcon,
   SquareLockPasswordIcon,
   ImageCompositionOvalIcon,
+  ViewIcon,
+  ViewOffIcon,
 } from "@hugeicons/core-free-icons";
 import { useAuth } from "@/hooks/auth";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
@@ -27,6 +29,7 @@ const LoginPage = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = useMemo(() => {
@@ -104,13 +107,27 @@ const LoginPage = () => {
               <InputGroup.Input
                 className="w-full px-4 text-base"
                 placeholder="••••••••"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 value={password}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSubmit();
                 }}
               />
+              <InputGroup.Suffix>
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  onPress={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <HugeiconsIcon
+                    icon={showPassword ? ViewOffIcon : ViewIcon}
+                    strokeWidth={2}
+                    className="size-4 text-muted"
+                  />
+                </Button>
+              </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 

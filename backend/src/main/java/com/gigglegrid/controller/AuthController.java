@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -73,5 +74,11 @@ public class AuthController {
     public ResponseEntity<?> logout(HttpSession session) {
         session.invalidate();
         return ResponseEntity.ok(Map.of("message", "Logged out."));
+    }
+
+    @GetMapping("/username-available")
+    public ResponseEntity<?> usernameAvailable(@RequestParam String username) {
+        boolean available = userService.isUsernameAvailable(username);
+        return ResponseEntity.ok(Map.of("available", available));
     }
 }

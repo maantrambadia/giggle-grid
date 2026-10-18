@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Spinner,
@@ -16,9 +17,14 @@ import {
   UserIcon,
   SquareLockPasswordIcon,
   ImageCompositionOvalIcon,
+  ViewIcon,
+  ViewOffIcon,
+  UserCheck01Icon,
+  UnavailableIcon,
 } from "@hugeicons/core-free-icons";
 import StateMessage from "@/components/ui/StateMessage";
 import { useAuth } from "@/hooks/auth";
+import * as authService from "@/services/authService";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 const RegisterPage = () => {
@@ -27,15 +33,17 @@ const RegisterPage = () => {
   const { register } = useAuth();
 
   const [username, setUsername] = useState("");
+  const [debouncedUsername, setDebouncedUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [displayedPasswordMismatch, setDisplayedPasswordMismatch] =
     useState(false);
   const [displayedUsernameTooShort, setDisplayedUsernameTooShort] =
     useState(false);
-  const [displayedPasswordTooShort, setDisplayedPasswordTooShort] =
-    useState(false);
+  const [displayedPasswordIssue, setDisplayedPasswordIssue] = useState(null);
 
   const passwordMismatch =
     confirmPassword.length > 0 &&
@@ -43,7 +51,19 @@ const RegisterPage = () => {
     password !== confirmPassword;
   const usernameTooShort =
     username.trim().length > 0 && username.trim().length < 3;
-  const passwordTooShort = password.length > 0 && password.length < 6;
+  const passwordIssue = useMemo(() => {
+    const p = password;
+    if (!p) return null;
+    if (p.length < 8) return "Password must be at least 8 characters.";
+    if (!/[A-Z]/.test(p))
+      return "Password must include at least 1 uppercase letter.";
+    if (!/[a-z]/.test(p))
+      return "Password must include at least 1 lowercase letter.";
+    if (!/[0-9]/.test(p)) return "Password must include at least 1 number.";
+    if (!/[^A-Za-z0-9]/.test(p))
+      return "Password must include at least 1 special character.";
+    return null;
+  }, [password]);
 
   const validationMessage = useMemo(() => {
     if (displayedPasswordMismatch) {
@@ -52,10 +72,10 @@ const RegisterPage = () => {
         description: "Please enter the same password in both fields.",
       };
     }
-    if (displayedPasswordTooShort) {
+    if (displayedPasswordIssue) {
       return {
-        title: "Password is too short",
-        description: "Password must be at least 6 characters.",
+        title: "Password requirements",
+        description: displayedPasswordIssue,
       };
     }
     if (displayedUsernameTooShort) {
@@ -67,18 +87,19 @@ const RegisterPage = () => {
     return null;
   }, [
     displayedPasswordMismatch,
-    displayedPasswordTooShort,
+    displayedPasswordIssue,
     displayedUsernameTooShort,
   ]);
 
   const canSubmit = useMemo(() => {
     return (
       username.trim().length >= 3 &&
-      password.length >= 6 &&
+      !passwordIssue &&
+      password.length >= 8 &&
       !passwordMismatch &&
       !submitting
     );
-  }, [username, password, passwordMismatch, submitting]);
+  }, [username, password, passwordIssue, passwordMismatch, submitting]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -90,10 +111,28 @@ const RegisterPage = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDisplayedUsernameTooShort(usernameTooShort);
-      setDisplayedPasswordTooShort(passwordTooShort);
+      setDisplayedPasswordIssue(passwordIssue);
     }, 400);
     return () => clearTimeout(timer);
-  }, [username, password, usernameTooShort, passwordTooShort]);
+  }, [username, password, usernameTooShort, passwordIssue]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedUsername(username.trim());
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [username]);
+
+  const { data: usernameAvailable, isFetching: isCheckingUsername } = useQuery({
+    queryKey: ["usernameAvailable", debouncedUsername],
+    queryFn: () => authService.checkUsernameAvailable(debouncedUsername),
+    enabled: debouncedUsername.length >= 3,
+  });
+
+  const isUsernameTaken =
+    debouncedUsername.length >= 3 && usernameAvailable?.available === false;
+  const isUsernameOk =
+    debouncedUsername.length >= 3 && usernameAvailable?.available === true;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -145,6 +184,23 @@ const RegisterPage = () => {
                 autoComplete="username"
                 value={username}
               />
+              <InputGroup.Suffix>
+                {isCheckingUsername ? (
+                  <Spinner color="current" size="sm" />
+                ) : isUsernameOk ? (
+                  <HugeiconsIcon
+                    icon={UserCheck01Icon}
+                    strokeWidth={2}
+                    className="size-4 text-success"
+                  />
+                ) : isUsernameTaken ? (
+                  <HugeiconsIcon
+                    icon={UnavailableIcon}
+                    strokeWidth={2}
+                    className="size-4 text-danger"
+                  />
+                ) : null}
+              </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 
@@ -166,10 +222,24 @@ const RegisterPage = () => {
               <InputGroup.Input
                 className="w-full px-4 text-base"
                 placeholder="••••••••"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 value={password}
               />
+              <InputGroup.Suffix>
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  onPress={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <HugeiconsIcon
+                    icon={showPassword ? ViewOffIcon : ViewIcon}
+                    strokeWidth={2}
+                    className="size-4 text-muted"
+                  />
+                </Button>
+              </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 
@@ -191,13 +261,29 @@ const RegisterPage = () => {
               <InputGroup.Input
                 className="w-full px-4 text-base"
                 placeholder="••••••••"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 autoComplete="new-password"
                 value={confirmPassword}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSubmit();
                 }}
               />
+              <InputGroup.Suffix>
+                <Button
+                  isIconOnly
+                  variant="ghost"
+                  onPress={() => setShowConfirmPassword((v) => !v)}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
+                >
+                  <HugeiconsIcon
+                    icon={showConfirmPassword ? ViewOffIcon : ViewIcon}
+                    strokeWidth={2}
+                    className="size-4 text-muted"
+                  />
+                </Button>
+              </InputGroup.Suffix>
             </InputGroup>
           </TextField>
 

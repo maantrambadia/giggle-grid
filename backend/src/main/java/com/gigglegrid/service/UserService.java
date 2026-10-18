@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
+    private static final int MIN_PASSWORD_LENGTH = 8;
+
     @Autowired
     private UserDao userDao;
 
@@ -24,10 +26,8 @@ public class UserService {
         if (password == null || password.isEmpty()) {
             throw new IllegalArgumentException("Password is required.");
         }
-        if (password.length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters.");
-        }
-        if (userDao.findByUsername(username) != null) {
+        validatePassword(password);
+        if (!isUsernameAvailable(username)) {
             throw new IllegalArgumentException("Username already taken.");
         }
         User user = new User();
@@ -52,5 +52,46 @@ public class UserService {
     @Transactional
     public User getById(Long id) {
         return userDao.findById(id);
+    }
+
+    @Transactional
+    public boolean isUsernameAvailable(String username) {
+        if (username == null) {
+            return false;
+        }
+        String u = username.trim();
+        if (u.isEmpty() || u.length() < 3) {
+            return false;
+        }
+        return userDao.findByUsername(u) == null;
+    }
+
+    private static void validatePassword(String password) {
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            throw new IllegalArgumentException("Password must be at least " + MIN_PASSWORD_LENGTH + " characters.");
+        }
+
+        boolean hasUpper = false;
+        boolean hasLower = false;
+        boolean hasDigit = false;
+        boolean hasSpecial = false;
+
+        for (int i = 0; i < password.length(); i++) {
+            char c = password.charAt(i);
+            if (Character.isUpperCase(c)) {
+                hasUpper = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLower = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else {
+                hasSpecial = true;
+            }
+        }
+
+        if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
+            throw new IllegalArgumentException(
+                    "Password must include uppercase, lowercase, number, and special character.");
+        }
     }
 }

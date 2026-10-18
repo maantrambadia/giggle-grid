@@ -9,3 +9,10 @@ export const register = (data) =>
   api.post("/auth/register", data).then((res) => res.data);
 
 export const logout = () => api.post("/auth/logout").then((res) => res.data);
+
+export const checkUsernameAvailable = (username) =>
+  api
+    .get("/auth/username-available", {
+      params: { username },
+    })
+    .then((res) => res.data);
