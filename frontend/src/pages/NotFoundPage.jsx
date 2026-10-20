@@ -7,7 +7,7 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 const NotFoundPage = () => {
   useDocumentTitle("Page Not Found");
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4">
       <div className="space-y-6 text-center">
         <h1 className="text-6xl font-bold tracking-tighter sm:text-7xl">404</h1>
         <h2 className="text-3xl font-semibold tracking-tight">

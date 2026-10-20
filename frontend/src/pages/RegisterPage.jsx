@@ -146,7 +146,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-10">
       <Card
         className="relative w-full max-w-xl p-6 shadow-xl backdrop-blur sm:p-10"
         variant="secondary"
