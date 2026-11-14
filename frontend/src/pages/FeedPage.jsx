@@ -135,15 +135,19 @@ const FeedPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
-                className="flex justify-center"
+                className="flex justify-center py-10"
               >
-                <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
-                  <HugeiconsIcon
-                    icon={Alert02Icon}
-                    strokeWidth={2}
-                    className="size-5 text-danger"
-                  />
-                  <span>Can’t load memes right now.</span>
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <span className="flex size-12 items-center justify-center rounded-full bg-danger/10">
+                    <HugeiconsIcon
+                      icon={Alert02Icon}
+                      strokeWidth={2}
+                      className="size-6 text-danger"
+                    />
+                  </span>
+                  <p className="text-sm text-muted-foreground">
+                    Can’t load memes right now.
+                  </p>
                 </div>
               </motion.div>
             ) : (
@@ -155,17 +159,17 @@ const FeedPage = () => {
                 transition={{ type: "spring", stiffness: 320, damping: 30 }}
               >
                 {list.length === 0 ? (
-                  <div className="flex justify-center">
-                    <div className="flex max-w-xl items-center gap-3 rounded-2xl border border-divider bg-default/20 px-4 py-3 text-sm text-muted-foreground">
+                  <div className="flex flex-col items-center gap-3 py-10 text-center">
+                    <span className="flex size-12 items-center justify-center rounded-full bg-default/40">
                       <HugeiconsIcon
                         icon={Image02Icon}
                         strokeWidth={2}
-                        className="size-5"
+                        className="size-6 text-muted-foreground"
                       />
-                      <span>
-                        No memes found. Be the first one to upload a meme.
-                      </span>
-                    </div>
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      No memes found. Be the first one to upload a meme.
+                    </p>
                   </div>
                 ) : (
                   <MemeScrollGrid
