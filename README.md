@@ -157,14 +157,14 @@ The database uses the **utf8mb4** character set, so it supports all kinds of tex
 
 <div align="center">
 
-|                                             |                                              |
-| :-----------------------------------------: | :------------------------------------------: |
-|            **Home / Feed Page**             |             **Upload Meme Page**             |
-|    `![Home Page](screenshots/feed.png)`     |   `![Upload Page](screenshots/upload.png)`   |
-|               **Login Page**                |              **Register Page**               |
-|   `![Login Page](screenshots/login.png)`    | `![Register Page](screenshots/register.png)` |
-|               **Meme Modal**                |                                              |
-| `![Meme Modal](screenshots/meme-modal.png)` |                                              |
+|                                                 |                                                     |
+| :---------------------------------------------: | :-------------------------------------------------: |
+|              **Home / Feed Page**               |                   **Meme Modal**                    |
+|  <img src="screenshots/feed.png" width="350"/>  | <img src="screenshots/meme-modal.png" width="350"/> |
+|                 **Login Page**                  |                  **Register Page**                  |
+| <img src="screenshots/login.png" width="350"/>  |  <img src="screenshots/register.png" width="350"/>  |
+|              **Upload Meme Page**               |                                                     |
+| <img src="screenshots/upload.png" width="350"/> |                                                     |
 
 </div>
 
